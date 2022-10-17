@@ -12,7 +12,7 @@ export class Role extends BaseEntity{
     name: string;
 
     @ApiProperty()
-    @Column({default: false})
+    @Column({default: false, name:"is_deleted"})
     isDeleted: boolean;
 
     @ApiProperty()

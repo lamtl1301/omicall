@@ -8,6 +8,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnviromentVariables } from 'src/interface/env.interface';
 import { JwtStrategy } from './jwt.strategy';
 import { AgentModule } from '../agent/agent.module';
+import { TokenService } from './token/token.service';
+import { Token } from './entities/token.entity';
 
 
 
@@ -15,7 +17,7 @@ import { AgentModule } from '../agent/agent.module';
   imports: [
   forwardRef(() => AgentModule),
 
-  TypeOrmModule.forFeature([Agent]),
+  TypeOrmModule.forFeature([Agent, Token]),
   JwtModule.registerAsync({
     imports: [ConfigModule],
     
@@ -26,7 +28,7 @@ import { AgentModule } from '../agent/agent.module';
   }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, TokenService, JwtStrategy],
   exports: [AuthService]
 })
 export class AuthModule { }

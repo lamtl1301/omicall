@@ -26,7 +26,7 @@ export class AgentService {
       if (agent.password.length == 0) {
         password = Math.random().toString(36).slice(-8);
       } else {
-        agent.is_first_login = false;
+        agent.isFirstLogin = false;
       }
         console.log(password)
         let hashedPassword = await bcrypt.hash(password, 12)
@@ -58,7 +58,7 @@ export class AgentService {
     // } catch (error) {
     //   throw error
     // }
-    return this.agentRepository.findOneByOrFail({ id });
+    return this.agentRepository.findOneByOrFail({ id});
   }
   async getByEmail(email: string) {
     try {
@@ -73,7 +73,7 @@ export class AgentService {
     try {
       const agent = await this.agentRepository.findOneOrFail({
         where: {
-          tenant_id: tenant_id,
+          tenantID: tenant_id,
           id: id
         }
       })
@@ -82,14 +82,15 @@ export class AgentService {
         if (updateAgentDto.password.length > 0) {
           let hashedPassword = await bcrypt.hash(updateAgentDto.password, 12)
           agent.password = hashedPassword;
-          agent.is_first_login = false;
-          agent.is_actived = true;
+          agent.isFirstLogin = false;
+          agent.isActived = true;
           message = "Change Agent password successfully"
         } else {
-          agent.full_name = updateAgentDto.full_name;
+          agent.fullName = updateAgentDto.fullName;
           agent.gender = updateAgentDto.gender;
           message = "Agent update successfully"
         }
+        agent.updatedAt = new Date()
         this.agentRepository.update(id, agent);
         return message
       } else {
@@ -105,13 +106,13 @@ export class AgentService {
     try {
       const agent = await this.agentRepository.findOneOrFail({
         where: {
-          tenant_id: tenant_id,
+          tenantID: tenant_id,
           id: id
         }
       });
       if (agent) {
-        agent.is_deleted = true;
-        agent.is_actived = false;
+        agent.isDeleted = true;
+        agent.isActived = false;
         this.agentRepository.update(id, agent)
         return "Agent delete successfully"
       } else {

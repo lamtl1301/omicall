@@ -9,6 +9,6 @@ export class SearchAgentDto {
 
     @IsString()
     @ApiProperty()
-    readonly full_name: string
+    readonly fullName: string
     
 }

@@ -4,10 +4,11 @@ import { AgentController } from './agent.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Agent } from './entities/agent.entity';
 import { Role } from './entities/role.entity';
+import { Token } from '../auth/entities/token.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Agent, Role])],
+  imports: [TypeOrmModule.forFeature([Agent, Role, Token])],
   controllers: [AgentController],
   providers: [AgentService],
   exports: [AgentService]

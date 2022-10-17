@@ -13,7 +13,7 @@ export class UpdateAgentDto {
 
     @IsString()
     @ApiProperty()
-    readonly full_name: string
+    readonly fullName: string
 
     @IsString()
     @ApiProperty()
@@ -21,21 +21,21 @@ export class UpdateAgentDto {
 
     @ApiProperty()
     @IsString()
-    readonly is_deleted: boolean
+    readonly isDeleted: boolean
 
     @ApiProperty()
     @IsBoolean()
-    readonly is_first_login: boolean
+    readonly isFirstLogin: boolean
 
     @ApiProperty()
     @IsBoolean()
-    readonly is_actived: boolean
+    readonly isActived: boolean
 
     @ApiProperty()
     @IsNumber()
-    readonly tag_id: number
+    readonly tagID: number
 
     @ApiProperty()
     @IsNumber()
-    readonly role_id: number
+    readonly roleID: number
 }

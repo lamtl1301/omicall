@@ -20,7 +20,7 @@ export class TenantController {
 
   @Get(':id')
   getTenant(@Param('id') id: string) {
-    return this.tenantService.findById(+id);
+    return this.tenantService.findById(id);
   }
 
   @Post()
@@ -30,11 +30,11 @@ export class TenantController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTenantDto: UpdateTenantDto) {
-    return this.tenantService.update(+id, updateTenantDto);
+    return this.tenantService.update(id, updateTenantDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.tenantService.remove(+id);
+    return this.tenantService.remove(id);
   }
 }

@@ -42,7 +42,7 @@ export class TenantService {
     
   }
 
-  async findById(id: number) {
+  async findById(id: string) {
     try {
       return this.tenantRepository.findOneByOrFail({ id });
     } catch (error) {
@@ -51,7 +51,7 @@ export class TenantService {
 
   }
 
-  async update(id: number, updateTenantDto: UpdateTenantDto) {
+  async update(id: string, updateTenantDto: UpdateTenantDto) {
     try {
       const tenant = await this.tenantRepository.findOneByOrFail({ id });
       tenant.full_name = updateTenantDto.full_name;
@@ -64,7 +64,7 @@ export class TenantService {
 
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     try {
       const tenant = await this.tenantRepository.findOneByOrFail({id})
       tenant.is_deleted = true;

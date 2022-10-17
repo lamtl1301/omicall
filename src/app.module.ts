@@ -9,6 +9,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
 import dataSource, { dataSourceOptions } from './config/ormconfig';
+import { CustomerModule } from './modules/customer/customer.module';
+import { PhoneNumberModule } from './modules/phone-number/phone-number.module';
+import { ProjectModule } from './modules/project/project.module';
 
 
 @Module({
@@ -20,6 +23,9 @@ import dataSource, { dataSourceOptions } from './config/ormconfig';
     AgentModule,
     TenantModule,
     AuthModule,
+    CustomerModule,
+    PhoneNumberModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService,

@@ -11,7 +11,7 @@ import { Agent } from './entities/agent.entity';
 
 @ApiTags('Agents')
 @ApiBearerAuth()
-@Controller('agents')
+@Controller(':tenantID/agents')
 export class AgentController {
   constructor(private readonly agentService: AgentService) { }
 

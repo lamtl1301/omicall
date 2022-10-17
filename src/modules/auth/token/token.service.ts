@@ -68,9 +68,9 @@ export class TokenService {
             this.configService.get<number>('ACCESS_TOKEN_EXPIRATION_MINUTES'),
             'minutes',
         );
-        const accessToken = this.createJWTToken(id, accessTokenExpires);
+        const accessToken = await this.createJWTToken(id, accessTokenExpires);
         console.log(accessToken)
-        const refreshToken = this.createRefreshToken(id)
+        const refreshToken = await this.createRefreshToken(id)
         console.log(refreshToken)
         return { accessToken,
             refreshToken,

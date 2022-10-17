@@ -1,5 +1,5 @@
 import { Agent } from 'src/modules/agent/entities/agent.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 
 export enum TokenType {
     REFRESH_TOKEN = 'refresh_token',
@@ -8,7 +8,7 @@ export enum TokenType {
 
 @Entity()
 export class Token {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: string;
 
     @Column({

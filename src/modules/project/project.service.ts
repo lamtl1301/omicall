@@ -42,7 +42,6 @@ export class ProjectService {
         where: {
           tenantID: tenantID,
           id: projectID,
-          
         }
       })
     } catch (error) {
@@ -73,6 +72,9 @@ export class ProjectService {
     } catch (error) {
       throw error
     }
+    
+  }
+  async gitsample(id: number){
     
   }
 }

@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageDto } from 'src/common/pagination.dto';
 import { Project } from './entities/project.entity';
+import { Agent } from '../agent/entities/agent.entity';
 
 @ApiTags('Project')
 @ApiBearerAuth()
@@ -15,8 +16,8 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectService.create(createProjectDto);
+  create(@Body() createProjectDto: CreateProjectDto, @Query() agent: Agent) {
+    return this.projectService.create(createProjectDto, agent);
   }
 
   @Get()

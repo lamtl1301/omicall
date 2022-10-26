@@ -5,7 +5,7 @@ import { PageMetaDto } from 'src/common/page-meta.dto';
 import { PageDto } from 'src/common/pagination.dto';
 
 import { Repository } from 'typeorm';
-import { Role } from '../agent/entities/role.entity';
+import { Role } from '../role/entities/role.entity';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { Tenant } from './entities/tenant.entity';

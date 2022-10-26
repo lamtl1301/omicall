@@ -1,5 +1,7 @@
 import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { BaseEntity } from "src/common/base.entity";
+import { Role } from "src/modules/role/entities/role.entity";
+import { ProjectAttribute } from "src/modules/attribute/entities/project-attribute.entity";
 import { Customer } from "src/modules/customer/entities/customer.entity";
 import { Tenant } from "src/modules/tenant/entities/tenant.entity";
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
@@ -38,5 +40,13 @@ export class Project extends BaseEntity{
     @ApiHideProperty()
     @OneToMany(type => Customer, (customer) => customer.project)
     customer: Customer[]
+
+    @ApiHideProperty()
+    @OneToMany(type => ProjectAttribute, (projectAttribute) => projectAttribute.project)
+    projectAttribute: ProjectAttribute[]
+
+    @ApiHideProperty()
+    @OneToMany(type => Role, (role) => role.project)
+    role: Role[]
 
 }

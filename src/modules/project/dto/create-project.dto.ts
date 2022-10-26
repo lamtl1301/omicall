@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsString } from "class-validator"
+import { IsArray, IsString } from "class-validator"
+import { Attribute } from "src/common/attribute.type"
 
 export class CreateProjectDto {
     @ApiProperty()
@@ -14,4 +15,7 @@ export class CreateProjectDto {
     @IsString()
     description: string
 
+    @ApiProperty()
+    @IsArray()
+    attribute: Attribute[]
 }

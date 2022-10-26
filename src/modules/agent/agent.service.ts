@@ -4,11 +4,13 @@ import { UpdateAgentDto } from './dto/update-agent.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm'
 import { Agent } from './entities/agent.entity';
-import { Role } from './entities/role.entity';
+import { Role } from '../role/entities/role.entity';
 import bcrypt from 'bcrypt'
 import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageDto } from 'src/common/pagination.dto';
 import { PageMetaDto } from 'src/common/page-meta.dto';
+import { AgentAttribute } from '../attribute/entities/agent-attribute.entity';
+import { Attribute } from '../attribute/entities/attribute.entity';
 
 @Injectable()
 export class AgentService {
@@ -16,25 +18,43 @@ export class AgentService {
     @InjectRepository(Agent)
     private readonly agentRepository: Repository<Agent>,
     @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>
+    private readonly roleRepository: Repository<Role>,
+    @InjectRepository(AgentAttribute)
+    private readonly agentAttributeRepository: Repository<AgentAttribute>,
+    @InjectRepository(Attribute)
+    private readonly attributeRepository: Repository<Attribute>
   ) { }
 
-  async create(tenant_id: string, createAgentDto: CreateAgentDto) {
+  async create(tenantID: string, createAgentDto: CreateAgentDto) {
     try {
-      const agent = this.agentRepository.create(createAgentDto);
-      let password = agent.password
-      if (agent.password.length == 0) {
-        password = Math.random().toString(36).slice(-8);
-      } else {
-        agent.isFirstLogin = false;
+      const checkAgent = await this.agentRepository.findOne({
+        where: {
+          email: createAgentDto.email,
+          tenantID: tenantID
+        }
+      })
+      if (checkAgent){
+        checkAgent.isActived = true;
+        checkAgent.isDeleted = false
+        return this.agentRepository.save(checkAgent)
+      } else{
+        const agent = this.agentRepository.create(createAgentDto);
+        let password = agent.password
+        if (agent.password.length == 0) {
+          password = Math.random().toString(36).slice(-8);
+        } else {
+          agent.isFirstLogin = false;
+        }
+          console.log(password)
+          let hashedPassword = await bcrypt.hash(password, 12)
+          //let hashedPassword = randomPassword
+          agent.password = hashedPassword;
+          agent.createAt = new Date();
+          agent.updatedAt = new Date();
+          //create default role with permission = agent
+          //
+        return this.agentRepository.save(agent);
       }
-        console.log(password)
-        let hashedPassword = await bcrypt.hash(password, 12)
-        //let hashedPassword = randomPassword
-        agent.password = hashedPassword;
-        agent.createAt = new Date();
-        agent.updatedAt = new Date();
-      return this.agentRepository.save(agent);
     } catch (error) {
       throw error
     }
@@ -69,11 +89,11 @@ export class AgentService {
   }
 
 
-  async update(id: number, tenant_id: string, updateAgentDto: UpdateAgentDto) {
+  async update(id: number, tenantID: string, updateAgentDto: UpdateAgentDto) {
     try {
       const agent = await this.agentRepository.findOneOrFail({
         where: {
-          tenantID: tenant_id,
+          tenantID: tenantID,
           id: id
         }
       })
@@ -88,6 +108,36 @@ export class AgentService {
         } else {
           agent.fullName = updateAgentDto.fullName;
           agent.gender = updateAgentDto.gender;
+          updateAgentDto.attribute.forEach( async attributeElement => {
+            const agentAttributeRecord = await this.agentAttributeRepository.findOne({
+              where: {
+                id: attributeElement.id,
+                agentID: id
+              }
+            })
+            if (agentAttributeRecord){
+              agentAttributeRecord.value = attributeElement.value;
+              const attributeRecord = await this.attributeRepository.findOne({
+                where: {
+                  id: agentAttributeRecord.attributeID
+                }
+              })
+              attributeRecord.attributeName = attributeElement.key
+              this.attributeRepository.save(attributeRecord)
+              this.agentAttributeRepository.save(agentAttributeRecord)
+            } else {
+              const newAttribute = await this.attributeRepository.create({
+                id: attributeElement.id,
+                attributeName: attributeElement.key
+              })
+              this.agentAttributeRepository.create({
+                attributeID: newAttribute.id,
+                agentID: id,
+                value: attributeElement.value
+              })
+            }
+          })
+          
           message = "Agent update successfully"
         }
         agent.updatedAt = new Date()
@@ -102,11 +152,11 @@ export class AgentService {
 
   }
 
-  async remove(id: number,tenant_id: string) {
+  async remove(id: number,tenantID: string) {
     try {
       const agent = await this.agentRepository.findOneOrFail({
         where: {
-          tenantID: tenant_id,
+          tenantID: tenantID,
           id: id
         }
       });

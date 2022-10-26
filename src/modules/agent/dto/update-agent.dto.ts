@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { Attribute } from 'src/common/attribute.type';
 import { CreateAgentDto } from './create-agent.dto';
 
 export class UpdateAgentDto {
@@ -38,4 +39,9 @@ export class UpdateAgentDto {
     @ApiProperty()
     @IsNumber()
     readonly roleID: number
+    
+    @ApiProperty()
+    @IsNumber()
+    readonly attribute: Attribute[]
+    
 }

@@ -4,6 +4,10 @@ import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageMetaDto } from 'src/common/page-meta.dto';
 import { PageDto } from 'src/common/pagination.dto';
 import { Repository } from 'typeorm';
+import { Agent } from '../agent/entities/agent.entity';
+import { Attribute } from '../attribute/entities/attribute.entity';
+import { ProjectAttribute } from '../attribute/entities/project-attribute.entity';
+import { RoleService } from '../role/role.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
@@ -12,12 +16,18 @@ import { Project } from './entities/project.entity';
 export class ProjectService {
   constructor(
     @InjectRepository(Project)
-    private readonly projectRepository: Repository<Project>
+    private readonly projectRepository: Repository<Project>,
+    @InjectRepository(ProjectAttribute)
+    private readonly projectAttributeRepository: Repository<ProjectAttribute>,
+    @InjectRepository(Attribute)
+    private readonly attributeRepository: Repository<Attribute>,
+    private readonly roleService: RoleService
   ){}
 
-  async create(createProjectDto: CreateProjectDto) {
+  async create(createProjectDto: CreateProjectDto, agent: Agent) {
     try {
-      
+      const newProject = this.projectRepository.create(createProjectDto)
+      this.roleService.createRoleTenantWhenCreatedNewProject(newProject, agent.id)
     } catch (error) {
       throw error
     }
@@ -55,6 +65,39 @@ export class ProjectService {
       updateProject.projectName = updateProjectDto.projectName;
       updateProject.isEnabled = updateProjectDto.isEnabled;
       // dynamic attribute update
+      updateProjectDto.attribute.forEach(async attributeElement => {
+        const projectAttributeRecord = await this.projectAttributeRepository.findOne({
+          where: {
+            id: attributeElement.id,
+            projectID: id
+          }
+        })
+        if (projectAttributeRecord){
+          // check attribute has record on database
+          // true -> update on database
+          projectAttributeRecord.value = attributeElement.value
+          const attributeRecord = await this.attributeRepository.findOne({
+            where: {
+              id: projectAttributeRecord.attributeID
+            }
+          })
+          attributeRecord.attributeName = attributeElement.key
+          this.attributeRepository.save(attributeRecord)
+          this.projectAttributeRepository.save(projectAttributeRecord)
+        } else {
+          // false -> create new
+          const newAttribute = await this.attributeRepository.create({
+            id: attributeElement.id, //id = timestamp 
+            attributeName: attributeElement.key
+          })
+          await this.projectAttributeRepository.create({
+            attributeID: newAttribute.id,
+            projectID: id,
+            value: attributeElement.value
+          })
+        }
+      //
+      });
       updateProject.updatedAt = new Date()
       return this.projectRepository.update(id, updateProject)
     } catch (error) {
@@ -74,7 +117,5 @@ export class ProjectService {
     }
     
   }
-  async gitsample(id: number){
-    
-  }
+
 }

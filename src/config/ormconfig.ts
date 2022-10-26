@@ -1,11 +1,11 @@
 import *as dotenv from 'dotenv'
 import { DataSource, DataSourceOptions } from 'typeorm'
 
-dotenv.config({path: __dirname + '/.env'});
+dotenv.config();
 
 export const dataSourceOptions: DataSourceOptions = ({
     type: 'postgres',
-    host: 'omicrm.cdliai7q6cf4.ap-southeast-1.rds.amazonaws.com',
+    host: 'omicall.cynisqrgpez0.ap-southeast-1.rds.amazonaws.com' ,
     port: 5432,
     username: 'postgres',
     password: 'se141056',

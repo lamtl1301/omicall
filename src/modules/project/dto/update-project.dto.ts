@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { IsString } from "class-validator"
+import { Attribute } from "src/common/attribute.type"
+
 import { Column } from "typeorm"
 
 
@@ -20,6 +22,8 @@ export class UpdateProjectDto{
     @Column({default: true})
     isEnabled: boolean
 
+    @Column()
+    attribute: Attribute[]
 
     // dynamic attribute update
 }

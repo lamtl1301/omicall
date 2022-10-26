@@ -12,6 +12,8 @@ import dataSource, { dataSourceOptions } from './config/ormconfig';
 import { CustomerModule } from './modules/customer/customer.module';
 import { PhoneNumberModule } from './modules/phone-number/phone-number.module';
 import { ProjectModule } from './modules/project/project.module';
+import { CallModule } from './modules/call/call.module';
+import { RoleModule } from './modules/role/role.module';
 
 
 @Module({
@@ -26,6 +28,9 @@ import { ProjectModule } from './modules/project/project.module';
     CustomerModule,
     PhoneNumberModule,
     ProjectModule,
+    CallModule,
+    RoleModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService,

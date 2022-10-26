@@ -1,9 +1,11 @@
 import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { BaseEntity } from "src/common/base.entity";
+import { AgentAttribute } from "src/modules/attribute/entities/agent-attribute.entity";
 import { Token } from "src/modules/auth/entities/token.entity";
+import { AgentRole } from "src/modules/role/entities/agent-role.entity";
 import { Tenant } from "src/modules/tenant/entities/tenant.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
-import { Role } from "./role.entity";
+import { Role } from "../../role/entities/role.entity";
 //import { Tag } from "./tag.entities";
 // import { Tenant } from "./tenant.entities";
 
@@ -47,17 +49,12 @@ export class Agent extends BaseEntity {
     tagID: number
 
     @ApiProperty()
-    @Column({nullable: true, name:"role_id"})
-    roleID: number
-
-    @ApiProperty()
     @Column({nullable: true, name:"tenant_id"})
     tenantID: string
 
     @ApiHideProperty()
-    @ManyToOne(type => Role, (role) => role.agent)
-    @JoinColumn({name: "role_id"})
-    role: Role
+    @OneToMany(type => AgentRole, (aRole) => aRole.agent)
+    agentRole: AgentRole[]
 
     @ApiHideProperty()
     @OneToMany(type => Token, (token) => token.agent)
@@ -67,6 +64,10 @@ export class Agent extends BaseEntity {
     @ManyToOne(type => Tenant, (tenant) => tenant.Agent)
     @JoinColumn({name: "tenant_id"})
     tenant: Tenant
+
+    @ApiHideProperty()
+    @OneToMany(type => AgentAttribute, (projectAttribute) => projectAttribute.agent)
+    agentAttribute: AgentAttribute[]
 
     // @OneToMany(type => Tag, (tag) => tag.agent)
     // @JoinColumn({name: "tag_id"})

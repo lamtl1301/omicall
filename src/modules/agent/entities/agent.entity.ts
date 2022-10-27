@@ -37,6 +37,10 @@ export class Agent extends BaseEntity {
     isActived: boolean
 
     @ApiProperty()
+    @Column({default: false, name:"is_owner"})
+    isOwner: boolean
+
+    @ApiProperty()
     @Column({nullable: true})
     gender: string
 
@@ -60,7 +64,7 @@ export class Agent extends BaseEntity {
     @OneToMany(type => Token, (token) => token.agent)
     token: Token[]
 
-    @ApiHideProperty()
+
     @ManyToOne(type => Tenant, (tenant) => tenant.Agent)
     @JoinColumn({name: "tenant_id"})
     tenant: Tenant

@@ -36,24 +36,24 @@ export class AgentController {
 
   @ApiBadRequestResponse({ description: 'Bad request' })
   @Post('')
-  create(@Param() tenant_id: string,
+  create(@Param() tenantID: string,
     @Body() createAgentDto: CreateAgentDto) {
-    return this.agentService.create(tenant_id,createAgentDto);
+    return this.agentService.create(tenantID,createAgentDto);
   }
 
   @ApiOkResponse({ description: 'Agent update successfully' })
   @ApiBadRequestResponse({ description: 'Bad request' })
   @Patch(':id')
   update(@Param('id') id: string,
-        @Param('tenant_id') tenant_id: string,
+        @Param('tenant_id') tenantID: string,
         @Body() updateAgentDto: UpdateAgentDto) {
-    return this.agentService.update(+id, tenant_id, updateAgentDto);
+    return this.agentService.update(+id, tenantID, updateAgentDto);
   }
 
   @ApiOkResponse({ description: 'Agent delete successfully' })
   @ApiBadRequestResponse()
   @Delete(':id')
-  remove(@Param('id') id: string, @Param('tenant_id') tenant_id: string) {
-    return this.agentService.remove(+id, tenant_id);
+  remove(@Param('id') id: string, @Param('tenant_id') tenantID: string) {
+    return this.agentService.remove(+id, tenantID);
   }
 }

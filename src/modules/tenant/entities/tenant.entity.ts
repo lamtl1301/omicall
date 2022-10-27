@@ -12,20 +12,24 @@ export class Tenant {
     id: string
 
     @ApiProperty()
-    @Column()
-    full_name: string
+    @Column({name: "full_name"})
+    fullName: string
 
     @ApiProperty()
     @Column()
     description: string
     
     @ApiProperty()
-    @Column({default: true})
-    is_enabled: boolean
+    @Column({default: true, name:"is_enabled"})
+    isEnabled: boolean
 
     @ApiProperty()
-    @Column({default: false})
-    is_deleted: boolean
+    @Column({default: false, name: "is_deleted"})
+    isDeleted: boolean
+
+    @ApiProperty()
+    @Column({default: false, name:"is_Vihat"})
+    isVihat: boolean
 
     @ApiProperty()
     @Column()
@@ -36,11 +40,11 @@ export class Tenant {
     language: string
 
     @ApiHideProperty()
-    @Column({nullable: true})
+    @Column({nullable: true, name:"create_at"})
     createAt: Date;
 
     @ApiHideProperty()
-    @Column({nullable: true})
+    @Column({nullable: true, name: "update_at"})
     updatedAt: Date;
 
     @ApiHideProperty()

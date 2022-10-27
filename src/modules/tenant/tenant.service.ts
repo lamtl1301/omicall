@@ -54,7 +54,7 @@ export class TenantService {
   async update(id: string, updateTenantDto: UpdateTenantDto) {
     try {
       const tenant = await this.tenantRepository.findOneByOrFail({ id });
-      tenant.full_name = updateTenantDto.full_name;
+      tenant.fullName = updateTenantDto.full_name;
       tenant.description = updateTenantDto.description;
       tenant.nation = updateTenantDto.nation
 
@@ -67,8 +67,8 @@ export class TenantService {
   async remove(id: string) {
     try {
       const tenant = await this.tenantRepository.findOneByOrFail({id})
-      tenant.is_deleted = true;
-      tenant.is_enabled = false;
+      tenant.isDeleted = true;
+      tenant.isEnabled = false;
     } catch (error) {
       throw error
     }

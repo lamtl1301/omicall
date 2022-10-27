@@ -109,32 +109,36 @@ export class AgentService {
           agent.fullName = updateAgentDto.fullName;
           agent.gender = updateAgentDto.gender;
           updateAgentDto.attribute.forEach( async attributeElement => {
-            const agentAttributeRecord = await this.agentAttributeRepository.findOne({
-              where: {
-                id: attributeElement.id,
-                agentID: id
-              }
-            })
-            if (agentAttributeRecord){
-              agentAttributeRecord.value = attributeElement.value;
-              const attributeRecord = await this.attributeRepository.findOne({
+            if (attributeElement.id === null || typeof(attributeElement.id) == null){
+              // create new
+            } else {
+              const agentAttributeRecord = await this.agentAttributeRepository.findOne({
                 where: {
-                  id: agentAttributeRecord.attributeID
+                  id: attributeElement.id,
+                  agentID: id
                 }
               })
-              attributeRecord.attributeName = attributeElement.key
-              this.attributeRepository.save(attributeRecord)
-              this.agentAttributeRepository.save(agentAttributeRecord)
-            } else {
-              const newAttribute = await this.attributeRepository.create({
-                id: attributeElement.id,
-                attributeName: attributeElement.key
-              })
-              this.agentAttributeRepository.create({
-                attributeID: newAttribute.id,
-                agentID: id,
-                value: attributeElement.value
-              })
+              if (agentAttributeRecord){
+                agentAttributeRecord.value = attributeElement.value;
+                const attributeRecord = await this.attributeRepository.findOne({
+                  where: {
+                    id: agentAttributeRecord.attributeID
+                  }
+                })
+                attributeRecord.attributeName = attributeElement.key
+                this.attributeRepository.save(attributeRecord)
+                this.agentAttributeRepository.save(agentAttributeRecord)
+              } else {
+                const newAttribute = await this.attributeRepository.create({
+                  id: attributeElement.id,
+                  attributeName: attributeElement.key
+                })
+                this.agentAttributeRepository.create({
+                  attributeID: newAttribute.id,
+                  agentID: id,
+                  value: attributeElement.value
+                })
+              }
             }
           })
           

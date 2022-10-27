@@ -1,6 +1,8 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 import { AppModule } from './app.module';
 
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
@@ -8,7 +10,7 @@ import { FormDataPipe } from './pipe/form-data.pipe';
 
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule)
   const port = process.env.PORT || 3000
   app.enableCors();
 
@@ -29,7 +31,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GlobalExceptionFilter())
   app.useGlobalPipes(new FormDataPipe())
-  app.useGlobalPipes(new ValidationPipe( {transform: true}))
-  await app.listen(3000);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }))
+  await app.listen(port)
 }
 bootstrap();

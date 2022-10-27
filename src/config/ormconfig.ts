@@ -10,6 +10,7 @@ export const dataSourceOptions: DataSourceOptions = ({
     username: 'postgres',
     password: 'se141056',
     database: 'omicall',
+    // database: 'omicall.test',
     entities: [__dirname + "/../**/*.entity{.ts,.js}"],
     logging: true,
     synchronize: false,

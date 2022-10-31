@@ -10,13 +10,15 @@ import { ProjectAttribute } from '../attribute/entities/project-attribute.entity
 import { Attribute } from '../attribute/entities/attribute.entity';
 import { RoleService } from '../role/role.service';
 import { RoleModule } from '../role/role.module';
+import { AgentService } from '../agent/agent.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Project, Customer, Tenant, Agent, ProjectAttribute, Attribute])
-    ,RoleModule
+    ,RoleModule,
+    
   ],
   controllers: [ProjectController],
-  providers: [ProjectService],
+  providers: [ProjectService, AgentService],
   exports: [ProjectService]
 })
 export class ProjectModule {}

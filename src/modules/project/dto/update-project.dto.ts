@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsString } from "class-validator"
+import { IsArray, IsBoolean, IsString } from "class-validator"
 import { Attribute } from "src/common/attribute.type"
 
 import { Column } from "typeorm"
@@ -19,10 +19,11 @@ export class UpdateProjectDto{
     description: string
 
     @ApiProperty()
-    @Column({default: true})
+    @IsBoolean()
     isEnabled: boolean
 
-    @Column()
+    @ApiProperty()
+    @IsArray()
     attribute: Attribute[]
 
     // dynamic attribute update

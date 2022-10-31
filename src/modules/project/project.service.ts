@@ -4,6 +4,7 @@ import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageMetaDto } from 'src/common/page-meta.dto';
 import { PageDto } from 'src/common/pagination.dto';
 import { Repository } from 'typeorm';
+import { AgentService } from '../agent/agent.service';
 import { Agent } from '../agent/entities/agent.entity';
 import { Attribute } from '../attribute/entities/attribute.entity';
 import { ProjectAttribute } from '../attribute/entities/project-attribute.entity';
@@ -21,11 +22,13 @@ export class ProjectService {
     private readonly projectAttributeRepository: Repository<ProjectAttribute>,
     @InjectRepository(Attribute)
     private readonly attributeRepository: Repository<Attribute>,
+    private readonly agentService: AgentService,
     private readonly roleService: RoleService
   ) { }
 
-  async create(createProjectDto: CreateProjectDto, agent: Agent) {
+  async create(createProjectDto: CreateProjectDto, agentID: number) {
     try {
+      const agent = await this.agentService.getById(agentID);
       if (agent.isOwner){
         const newProject = this.projectRepository.create(createProjectDto)
         

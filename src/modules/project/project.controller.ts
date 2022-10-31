@@ -16,8 +16,8 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto, @Query() agent: Agent) {
-    return this.projectService.create(createProjectDto, agent);
+  create(@Body() createProjectDto: CreateProjectDto, @Query() agentID: number) {
+    return this.projectService.create(createProjectDto, agentID);
   }
 
   @Get()

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageMetaDto } from 'src/common/page-meta.dto';
@@ -22,19 +22,24 @@ export class ProjectService {
     @InjectRepository(Attribute)
     private readonly attributeRepository: Repository<Attribute>,
     private readonly roleService: RoleService
-  ){}
+  ) { }
 
   async create(createProjectDto: CreateProjectDto, agent: Agent) {
     try {
-      const newProject = this.projectRepository.create(createProjectDto)
-      this.roleService.createRoleTenantWhenCreatedNewProject(newProject, agent.id)
+      if (agent.isOwner){
+        const newProject = this.projectRepository.create(createProjectDto)
+        
+      } else {
+        throw new ForbiddenException('Access denied')
+      }
+
     } catch (error) {
       throw error
     }
 
   }
 
-  async getListProject( pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>> {
+  async getListProject(pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>> {
     const queryBuilder = this.projectRepository.createQueryBuilder("project");
     queryBuilder
       .orderBy("project.createAt", pageOptionsDto.order)
@@ -42,8 +47,18 @@ export class ProjectService {
       .take(pageOptionsDto.take)
     const itemCount = await queryBuilder.getCount()
     const { entities } = await queryBuilder.getRawAndEntities();
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto});
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto(entities, pageMetaDto)
+  }
+
+  async getListProjectOfAgent(agent: Agent) {
+    const listProject = this.projectRepository.find({
+      where: {
+        tenantID: agent.tenantID,
+
+      }
+    })
+    return listProject;
   }
 
   async getById(projectID: number, tenantID: string) {
@@ -60,32 +75,14 @@ export class ProjectService {
   }
 
   async update(tenantID: string, id: number, updateProjectDto: UpdateProjectDto) {
-    const updateProject= await this.getById(id, tenantID);
+    const updateProject = await this.getById(id, tenantID);
     try {
       updateProject.projectName = updateProjectDto.projectName;
       updateProject.isEnabled = updateProjectDto.isEnabled;
       // dynamic attribute update
       updateProjectDto.attribute.forEach(async attributeElement => {
-        const projectAttributeRecord = await this.projectAttributeRepository.findOne({
-          where: {
-            id: attributeElement.id,
-            projectID: id
-          }
-        })
-        if (projectAttributeRecord){
-          // check attribute has record on database
-          // true -> update on database
-          projectAttributeRecord.value = attributeElement.value
-          const attributeRecord = await this.attributeRepository.findOne({
-            where: {
-              id: projectAttributeRecord.attributeID
-            }
-          })
-          attributeRecord.attributeName = attributeElement.key
-          this.attributeRepository.save(attributeRecord)
-          this.projectAttributeRepository.save(projectAttributeRecord)
-        } else {
-          // false -> create new
+        if (attributeElement === null || typeof (attributeElement) == null) {
+          //sentAttribute.id is null => create new
           const newAttribute = await this.attributeRepository.create({
             id: attributeElement.id, //id = timestamp 
             attributeName: attributeElement.key
@@ -95,9 +92,25 @@ export class ProjectService {
             projectID: id,
             value: attributeElement.value
           })
+        } else {
+          // sentAttribute.id not null => update record
+          const projectAttributeRecord = await this.projectAttributeRepository.findOne({
+            where: {
+              id: attributeElement.id,
+              projectID: id
+            }
+          })
+          projectAttributeRecord.value = attributeElement.value
+          const attributeRecord = await this.attributeRepository.findOne({
+            where: {
+              id: projectAttributeRecord.attributeID
+            }
+          })
+          attributeRecord.attributeName = attributeElement.key
+          this.attributeRepository.save(attributeRecord)
+          this.projectAttributeRepository.save(projectAttributeRecord)
         }
-      //
-      });
+      })
       updateProject.updatedAt = new Date()
       return this.projectRepository.update(id, updateProject)
     } catch (error) {
@@ -106,7 +119,7 @@ export class ProjectService {
   }
 
   async remove(id: number, tenant_id: string) {
-    const project= await this.getById(id, tenant_id)
+    const project = await this.getById(id, tenant_id)
     try {
       project.isDeleted = true;
       project.isEnabled = false;
@@ -115,7 +128,7 @@ export class ProjectService {
     } catch (error) {
       throw error
     }
-    
+
   }
 
 }

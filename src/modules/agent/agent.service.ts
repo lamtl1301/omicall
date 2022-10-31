@@ -25,7 +25,7 @@ export class AgentService {
     private readonly attributeRepository: Repository<Attribute>
   ) { }
 
-  async create(tenantID: string, createAgentDto: CreateAgentDto) {
+  async createAgent(tenantID: string, createAgentDto: CreateAgentDto) {
     try {
       const checkAgent = await this.agentRepository.findOne({
         where: {
@@ -59,6 +59,12 @@ export class AgentService {
       throw error
     }
   }
+
+  async getAll(){
+    return this.agentRepository
+  }
+
+
 
   async getListAgent( pageOptionsDto: PageOptionsDto): Promise<PageDto<Agent>> {
     const queryBuilder = this.agentRepository.createQueryBuilder("agent");
@@ -109,9 +115,20 @@ export class AgentService {
           agent.fullName = updateAgentDto.fullName;
           agent.gender = updateAgentDto.gender;
           updateAgentDto.attribute.forEach( async attributeElement => {
+            // id == null => create new 
             if (attributeElement.id === null || typeof(attributeElement.id) == null){
               // create new
+              const newAttribute = await this.attributeRepository.create({
+                id: attributeElement.id,
+                attributeName: attributeElement.key
+              })
+              this.agentAttributeRepository.create({
+                attributeID: newAttribute.id,
+                agentID: id,
+                value: attributeElement.value
+              })
             } else {
+              // id != null => update attribute
               const agentAttributeRecord = await this.agentAttributeRepository.findOne({
                 where: {
                   id: attributeElement.id,
@@ -128,17 +145,8 @@ export class AgentService {
                 attributeRecord.attributeName = attributeElement.key
                 this.attributeRepository.save(attributeRecord)
                 this.agentAttributeRepository.save(agentAttributeRecord)
-              } else {
-                const newAttribute = await this.attributeRepository.create({
-                  id: attributeElement.id,
-                  attributeName: attributeElement.key
-                })
-                this.agentAttributeRepository.create({
-                  attributeID: newAttribute.id,
-                  agentID: id,
-                  value: attributeElement.value
-                })
-              }
+              } 
+              
             }
           })
           

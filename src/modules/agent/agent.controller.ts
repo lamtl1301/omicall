@@ -38,7 +38,7 @@ export class AgentController {
   @Post('')
   create(@Param() tenantID: string,
     @Body() createAgentDto: CreateAgentDto) {
-    return this.agentService.create(tenantID,createAgentDto);
+    return this.agentService.createAgent(tenantID,createAgentDto);
   }
 
   @ApiOkResponse({ description: 'Agent update successfully' })

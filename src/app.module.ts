@@ -18,9 +18,8 @@ import { RoleModule } from './modules/role/role.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true
-    }),
+    ConfigModule.forRoot(),
+    
     TypeOrmModule.forRoot(dataSourceOptions),
     AgentModule,
     TenantModule,

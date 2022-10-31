@@ -1,10 +1,11 @@
+import { BaseEntity } from 'src/common/base.entity';
 import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
 import { FileRecord } from './file.entity';
 
 @Entity()
-export class HistoryCall  {
-    @PrimaryColumn()
-    id: number;
+export class HistoryCall extends BaseEntity {
+    // @PrimaryColumn()
+    // id: number;
 
     // @Column({name: "session_id"})
     // sessionID: string;
@@ -28,7 +29,7 @@ export class HistoryCall  {
     duration: number
 
     @Column({name: "disposition"})
-    disposition: number
+    disposition: string
 
     @OneToMany((type) => FileRecord, (file) => file.historyCall)
     @JoinColumn({name: "file_id"})

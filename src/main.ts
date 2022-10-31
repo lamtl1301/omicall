@@ -6,6 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
+import { AgentService } from './modules/agent/agent.service';
 import { FormDataPipe } from './pipe/form-data.pipe';
 
 
@@ -35,3 +36,4 @@ async function bootstrap() {
   await app.listen(port)
 }
 bootstrap();
+

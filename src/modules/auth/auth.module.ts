@@ -10,13 +10,16 @@ import { JwtStrategy } from './jwt.strategy';
 import { AgentModule } from '../agent/agent.module';
 import { TokenService } from './token/token.service';
 import { Token } from './entities/token.entity';
+import { ProjectModule } from '../project/project.module';
+import { TenantModule } from '../tenant/tenant.module';
 
 
 
 @Module({
   imports: [
   forwardRef(() => AgentModule),
-
+  forwardRef(() => TenantModule),
+  forwardRef(() => ProjectModule),
   TypeOrmModule.forFeature([Agent, Token]),
   JwtModule.registerAsync({
     imports: [ConfigModule],
@@ -28,7 +31,7 @@ import { Token } from './entities/token.entity';
   }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, TokenService, JwtStrategy],
+  providers: [AuthService, TokenService, JwtStrategy, ConfigService],
   exports: [AuthService]
 })
 export class AuthModule { }

@@ -20,16 +20,12 @@ export class RoleService {
     
     async createRoleTenantWhenCreatedNewProject(project: Project, agentID: number){
         try {
-            const tenantRoleforNewCreatedProject = this.roleRepository.create({
-                projectID: project.id,
-                permission: RolePermission.TENANT,
-                isOwner: true,
-                name: "Owner",
+            const agent = await this.agentRepository.findOne({
+                where: {
+                    id: agentID
+                }
             })
-            await this.agentRoleRepository.create({
-                roleID: tenantRoleforNewCreatedProject.id,
-                agentID: agentID
-            })
+
         } catch (error) {
             throw error
         }

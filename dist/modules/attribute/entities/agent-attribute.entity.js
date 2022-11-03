@@ -29,7 +29,7 @@ __decorate([
     __metadata("design:type", Number)
 ], AgentAttribute.prototype, "displayIndex", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(type => attribute_entity_1.Attribute, (attribute) => attribute.projectAttribute),
+    (0, typeorm_1.ManyToOne)(type => attribute_entity_1.Attribute, (attribute) => attribute.agentAttribute),
     (0, typeorm_1.JoinColumn)({ name: "attribute_id" }),
     __metadata("design:type", attribute_entity_1.Attribute)
 ], AgentAttribute.prototype, "attribute", void 0);

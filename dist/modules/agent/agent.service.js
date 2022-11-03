@@ -47,7 +47,10 @@ let AgentService = class AgentService {
                 return this.agentRepository.save(checkAgent);
             }
             else {
-                const agent = this.agentRepository.create(createAgentDto);
+                const agent = this.agentRepository.create({
+                    email: createAgentDto.email,
+                    password: createAgentDto.password
+                });
                 let password = agent.password;
                 if (agent.password.length == 0) {
                     password = Math.random().toString(36).slice(-8);
@@ -82,7 +85,7 @@ let AgentService = class AgentService {
         return new pagination_dto_1.PageDto(entities, pageMetaDto);
     }
     async getById(id) {
-        return this.agentRepository.findOneByOrFail({ id });
+        return this.agentRepository.findOneBy({ id });
     }
     async getByEmail(email) {
         try {

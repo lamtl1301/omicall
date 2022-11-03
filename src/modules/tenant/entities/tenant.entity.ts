@@ -3,12 +3,12 @@ import { Agent } from "src/modules/agent/entities/agent.entity";
 
 import { Role } from "src/modules/role/entities/role.entity";
 import { Project } from "src/modules/project/entities/project.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 @Entity() 
 export class Tenant {
 
     @ApiProperty()
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: string
 
     @ApiProperty()

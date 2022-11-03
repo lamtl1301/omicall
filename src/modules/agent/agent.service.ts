@@ -38,7 +38,10 @@ export class AgentService {
         checkAgent.isDeleted = false
         return this.agentRepository.save(checkAgent)
       } else{
-        const agent = this.agentRepository.create(createAgentDto);
+        const agent = this.agentRepository.create({
+          email: createAgentDto.email,
+          password: createAgentDto.password
+        });
         let password = agent.password
         if (agent.password.length == 0) {
           password = Math.random().toString(36).slice(-8);
@@ -52,13 +55,14 @@ export class AgentService {
           agent.createAt = new Date();
           agent.updatedAt = new Date();
           //create default role with permission = agent
-          //
+          //agent.isOwner = true
         return this.agentRepository.save(agent);
       }
     } catch (error) {
       throw error
     }
   }
+
 
   async getAll(){
     return this.agentRepository
@@ -84,7 +88,7 @@ export class AgentService {
     // } catch (error) {
     //   throw error
     // }
-    return this.agentRepository.findOneByOrFail({ id});
+    return this.agentRepository.findOneBy({ id});
   }
   async getByEmail(email: string) {
     try {

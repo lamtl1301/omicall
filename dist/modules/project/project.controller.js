@@ -20,6 +20,7 @@ const create_project_dto_1 = require("./dto/create-project.dto");
 const update_project_dto_1 = require("./dto/update-project.dto");
 const swagger_1 = require("@nestjs/swagger");
 const page_option_dto_1 = require("../../common/dto/page-option.dto");
+const user_decorator_1 = require("../../decorator/user.decorator");
 let ProjectController = class ProjectController {
     constructor(projectService) {
         this.projectService = projectService;
@@ -27,17 +28,18 @@ let ProjectController = class ProjectController {
     create(createProjectDto, agentID) {
         return this.projectService.create(createProjectDto, agentID);
     }
-    async getListProject(pageOptionsDto) {
-        return this.projectService.getListProject(pageOptionsDto);
+    async getListProject(tenantID, pageOptionsDto) {
+        console.log("tenantID", tenantID);
+        return this.projectService.getListProject(tenantID, pageOptionsDto);
     }
-    findOne(id, tenant_id) {
-        return this.projectService.getById(id, tenant_id);
+    findOne(projectID, tenant_id) {
+        return this.projectService.getById(projectID, tenant_id);
     }
-    update(tenant_id, id, updateProjectDto) {
-        return this.projectService.update(tenant_id, id, updateProjectDto);
+    update(tenantID, id, updateProjectDto) {
+        return this.projectService.update(tenantID, id, updateProjectDto);
     }
-    remove(tenant_id, id) {
-        return this.projectService.remove(id, tenant_id);
+    remove(tenantID, id) {
+        return this.projectService.remove(id, tenantID);
     }
 };
 __decorate([
@@ -52,25 +54,26 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Query)()),
+    __param(0, (0, user_decorator_1.User)('tenantID')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [page_option_dto_1.PageOptionsDto]),
+    __metadata("design:paramtypes", [String, page_option_dto_1.PageOptionsDto]),
     __metadata("design:returntype", Promise)
 ], ProjectController.prototype, "getListProject", null);
 __decorate([
     (0, common_1.Get)(':id'),
     openapi.ApiResponse({ status: 200, type: require("./entities/project.entity").Project }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('tenant_id')),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, user_decorator_1.User)('tenant_id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", void 0)
 ], ProjectController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)('tenant_id')),
-    __param(1, (0, common_1.Param)('id')),
+    openapi.ApiResponse({ status: 200, type: require("./entities/project.entity").Project }),
+    __param(0, (0, user_decorator_1.User)('tenant_id')),
+    __param(1, (0, user_decorator_1.User)('id')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number, update_project_dto_1.UpdateProjectDto]),
@@ -79,8 +82,8 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':id'),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)('tenant_id')),
-    __param(1, (0, common_1.Param)('id')),
+    __param(0, (0, user_decorator_1.User)('tenant_id')),
+    __param(1, (0, user_decorator_1.User)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number]),
     __metadata("design:returntype", void 0)

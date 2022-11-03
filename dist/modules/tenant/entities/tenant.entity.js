@@ -22,7 +22,7 @@ let Tenant = class Tenant {
 };
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    (0, typeorm_1.PrimaryColumn)(),
     __metadata("design:type", String)
 ], Tenant.prototype, "id", void 0);
 __decorate([

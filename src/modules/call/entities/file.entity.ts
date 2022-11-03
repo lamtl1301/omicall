@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { HistoryCall } from './call.entity';
-import { FileType } from './file-type.entity';
+
 
 @Entity()
 export class FileRecord {
@@ -18,10 +18,6 @@ export class FileRecord {
 
     @Column({name: "is_deleted", default:"false"})
     isDeleted: boolean
-
-    @ManyToOne((type) => FileType, (fileType) => fileType.file)
-    @JoinColumn({name: "file_type_id"})
-    fileType: FileType
 
     @ManyToOne((type) => HistoryCall, (historyCall) => historyCall.file)
     historyCall: HistoryCall

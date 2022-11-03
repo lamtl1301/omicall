@@ -39,7 +39,7 @@ let AuthService = class AuthService {
             const user = await this.agentService.getByEmail(email);
             if (user && bcrypt_1.default.compare(password, user.password) && user.isDeleted == false) {
                 const tenant = await this.tenantService.findById(user.tenantID);
-                if (tenant && tenant.isVihat == true) {
+                if (tenant && tenant.isVihat == true || user.isOwner == true) {
                     const token = await this.tokenService.createAuthToken(user.id);
                     return { user, token };
                 }

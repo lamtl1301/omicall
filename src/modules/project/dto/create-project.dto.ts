@@ -1,15 +1,19 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsArray, IsString } from "class-validator"
+import { IsArray, IsNumber, IsString } from "class-validator"
 import { Attribute } from "src/common/attribute.type"
 
 export class CreateProjectDto {
+    @ApiProperty()
+    @IsNumber()
+    tenantID: string 
+
     @ApiProperty()
     @IsString()
     projectName: string
 
     @ApiProperty()
     @IsString()
-    domain: string
+    pbx_domain: string
 
     @ApiProperty()
     @IsString()

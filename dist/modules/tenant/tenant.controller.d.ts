@@ -7,9 +7,11 @@ import { Tenant } from './entities/tenant.entity';
 export declare class TenantController {
     private readonly tenantService;
     constructor(tenantService: TenantService);
-    getListTenant(pageOptionsDto: PageOptionsDto): Promise<PageDto<Tenant>>;
+    getListTenant(userID: number, pageOptionsDto: PageOptionsDto): Promise<PageDto<Tenant>>;
     getTenant(id: string): Promise<Tenant>;
-    create(createTenantDto: CreateTenantDto): Promise<Tenant>;
+    create(userID: number, createTenantDto: CreateTenantDto): Promise<{
+        tenant: Tenant;
+    }>;
     update(id: string, updateTenantDto: UpdateTenantDto): Promise<void>;
     remove(id: string): Promise<void>;
 }

@@ -24,11 +24,12 @@ const agent_role_entity_1 = require("../role/entities/agent-role.entity");
 const project_service_1 = require("../project/project.service");
 const project_entity_1 = require("../project/entities/project.entity");
 const project_attribute_entity_1 = require("../attribute/entities/project-attribute.entity");
+const tenant_entity_1 = require("../tenant/entities/tenant.entity");
 let AgentModule = class AgentModule {
 };
 AgentModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([agent_entity_1.Agent, role_entity_1.Role, token_entity_1.Token, agent_attribute_entity_1.AgentAttribute, attribute_entity_1.Attribute, agent_role_entity_1.AgentRole, project_entity_1.Project, project_attribute_entity_1.ProjectAttribute]),
+        imports: [typeorm_1.TypeOrmModule.forFeature([agent_entity_1.Agent, role_entity_1.Role, token_entity_1.Token, agent_attribute_entity_1.AgentAttribute, attribute_entity_1.Attribute, agent_role_entity_1.AgentRole, project_entity_1.Project, project_attribute_entity_1.ProjectAttribute, tenant_entity_1.Tenant]),
             (0, common_1.forwardRef)(() => role_module_1.RoleModule),
             (0, common_1.forwardRef)(() => project_module_1.ProjectModule),
             (0, common_1.forwardRef)(() => attribute_module_1.AttributeModule),

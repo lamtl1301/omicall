@@ -11,13 +11,6 @@ export class CreateAgentDto {
     @ApiProperty()
     readonly email: string
 
-    @IsString()
-    @ApiProperty()
-    readonly full_name: string
-
-    @IsString()
-    @ApiProperty()
-    readonly gender: string
 
     
 }

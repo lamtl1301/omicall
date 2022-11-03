@@ -14,7 +14,7 @@ export class Project extends BaseEntity{
 
     @ApiProperty()
     @Column()
-    domain: string
+    pbx_domain: string
 
     @ApiProperty()
     @Column()

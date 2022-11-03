@@ -17,9 +17,9 @@ export declare class ProjectService {
     private readonly roleService;
     constructor(projectRepository: Repository<Project>, projectAttributeRepository: Repository<ProjectAttribute>, attributeRepository: Repository<Attribute>, agentService: AgentService, roleService: RoleService);
     create(createProjectDto: CreateProjectDto, agentID: number): Promise<void>;
-    getListProject(pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>>;
+    getListProject(tenantID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>>;
     getListProjectOfAgent(agent: Agent): Promise<Project[]>;
     getById(projectID: number, tenantID: string): Promise<Project>;
-    update(tenantID: string, id: number, updateProjectDto: UpdateProjectDto): Promise<import("typeorm").UpdateResult>;
+    update(tenantID: string, id: number, updateProjectDto: UpdateProjectDto): Promise<Project>;
     remove(id: number, tenant_id: string): Promise<import("typeorm").UpdateResult>;
 }

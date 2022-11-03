@@ -13,7 +13,6 @@ const call_controller_1 = require("./call.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const call_entity_1 = require("./entities/call.entity");
 const file_entity_1 = require("./entities/file.entity");
-const file_type_entity_1 = require("./entities/file-type.entity");
 const file_service_1 = require("./file/file.service");
 const agent_module_1 = require("../agent/agent.module");
 const file_module_1 = require("./file/file.module");
@@ -26,7 +25,7 @@ CallModule = __decorate([
             (0, common_1.forwardRef)(() => agent_module_1.AgentModule),
             (0, common_1.forwardRef)(() => file_module_1.FileModule),
             (0, common_1.forwardRef)(() => config_1.ConfigModule),
-            typeorm_1.TypeOrmModule.forFeature([call_entity_1.HistoryCall, file_entity_1.FileRecord, file_type_entity_1.FileType]),
+            typeorm_1.TypeOrmModule.forFeature([call_entity_1.HistoryCall, file_entity_1.FileRecord]),
         ],
         controllers: [call_controller_1.CallController],
         providers: [call_service_1.CallService, file_service_1.FileService, config_1.ConfigService],

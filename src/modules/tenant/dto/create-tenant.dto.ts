@@ -6,21 +6,22 @@ export class CreateTenantDto {
 
     @IsString()
     @ApiProperty()
+    id: string
+
+    @IsString()
+    @ApiProperty()
     full_name: string
 
     @IsString()
     @ApiProperty()
     description: string
-    
 
-
-    @IsBoolean()
+    @IsString()
     @ApiProperty()
     nation: string
 
     @IsString()
     @ApiProperty()
     language: string
-
 
 }

@@ -8,8 +8,8 @@ export declare class ProjectController {
     private readonly projectService;
     constructor(projectService: ProjectService);
     create(createProjectDto: CreateProjectDto, agentID: number): Promise<void>;
-    getListProject(pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>>;
-    findOne(id: number, tenant_id: string): Promise<Project>;
-    update(tenant_id: string, id: number, updateProjectDto: UpdateProjectDto): Promise<import("typeorm").UpdateResult>;
-    remove(tenant_id: string, id: number): Promise<import("typeorm").UpdateResult>;
+    getListProject(tenantID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>>;
+    findOne(projectID: number, tenant_id: string): Promise<Project>;
+    update(tenantID: string, id: number, updateProjectDto: UpdateProjectDto): Promise<Project>;
+    remove(tenantID: string, id: number): Promise<import("typeorm").UpdateResult>;
 }

@@ -6,16 +6,19 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageDto } from 'src/common/pagination.dto';
 import { Tenant } from './entities/tenant.entity';
+import { User } from 'src/decorator/user.decorator';
 
-@ApiTags('Tenants')
+@ApiTags('Tenant')
 @ApiBearerAuth()
-@Controller('tenants')
+@Controller('tenant')
 export class TenantController {
   constructor(private readonly tenantService: TenantService) {}
 
   @Get()
-  getListTenant(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<Tenant>> {
-    return this.tenantService.getListTenant(pageOptionsDto);
+  getListTenant(
+    @User('id') userID: number,
+    @Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<Tenant>> {
+    return this.tenantService.getListTenant(pageOptionsDto, userID);
   }
 
   @Get(':id')
@@ -24,8 +27,11 @@ export class TenantController {
   }
 
   @Post()
-  create(@Body() createTenantDto: CreateTenantDto) {
-    return this.tenantService.create(createTenantDto);
+  create(
+    @User('id') userID: number,
+    @Body() createTenantDto: CreateTenantDto) {
+    console.log(createTenantDto instanceof CreateTenantDto)
+    return this.tenantService.create(userID, createTenantDto);
   }
 
   @Patch(':id')

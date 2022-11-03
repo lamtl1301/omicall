@@ -13,10 +13,9 @@ exports.FileRecord = void 0;
 const openapi = require("@nestjs/swagger");
 const typeorm_1 = require("typeorm");
 const call_entity_1 = require("./call.entity");
-const file_type_entity_1 = require("./file-type.entity");
 let FileRecord = class FileRecord {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => Number }, fileName: { required: true, type: () => String }, fileTypeID: { required: true, type: () => Number }, recordSeconds: { required: true, type: () => Number }, isDeleted: { required: true, type: () => Boolean }, fileType: { required: true, type: () => require("./file-type.entity").FileType }, historyCall: { required: true, type: () => require("./call.entity").HistoryCall } };
+        return { id: { required: true, type: () => Number }, fileName: { required: true, type: () => String }, fileTypeID: { required: true, type: () => Number }, recordSeconds: { required: true, type: () => Number }, isDeleted: { required: true, type: () => Boolean }, historyCall: { required: true, type: () => require("./call.entity").HistoryCall } };
     }
 };
 __decorate([
@@ -39,11 +38,6 @@ __decorate([
     (0, typeorm_1.Column)({ name: "is_deleted", default: "false" }),
     __metadata("design:type", Boolean)
 ], FileRecord.prototype, "isDeleted", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)((type) => file_type_entity_1.FileType, (fileType) => fileType.file),
-    (0, typeorm_1.JoinColumn)({ name: "file_type_id" }),
-    __metadata("design:type", file_type_entity_1.FileType)
-], FileRecord.prototype, "fileType", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)((type) => call_entity_1.HistoryCall, (historyCall) => historyCall.file),
     __metadata("design:type", call_entity_1.HistoryCall)

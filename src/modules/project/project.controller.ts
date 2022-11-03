@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Delete, Query, Param } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -7,6 +7,7 @@ import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageDto } from 'src/common/pagination.dto';
 import { Project } from './entities/project.entity';
 import { Agent } from '../agent/entities/agent.entity';
+import { User } from 'src/decorator/user.decorator';
 
 @ApiTags('Project')
 @ApiBearerAuth()
@@ -22,27 +23,30 @@ export class ProjectController {
 
   @Get()
   async getListProject(
+    @User('tenantID') tenantID: string ,
     @Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>> {
-    return this.projectService.getListProject(pageOptionsDto);
+      console.log("tenantID", tenantID)
+      return this.projectService.getListProject(tenantID, pageOptionsDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number, @Param('tenant_id') tenant_id: string) {
-    return this.projectService.getById(id, tenant_id);
+    findOne(@Param() projectID: number, 
+          @User('tenant_id') tenant_id: string) {
+    return this.projectService.getById(projectID, tenant_id);
   }
 
   @Patch(':id')
   update(
-    @Param('tenant_id') tenant_id: string,
-    @Param('id') id: number,
+    @User('tenant_id') tenantID: string,
+    @User('id') id: number,
     @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectService.update(tenant_id, id, updateProjectDto);
+    return this.projectService.update(tenantID, id, updateProjectDto);
   }
 
   @Delete(':id')
   remove(
-    @Param('tenant_id') tenant_id: string,
-    @Param('id') id: number) {
-    return this.projectService.remove(id, tenant_id);
+    @User('tenant_id') tenantID: string,
+    @User('id') id: number) {
+    return this.projectService.remove(id, tenantID);
   }
 }

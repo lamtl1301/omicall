@@ -41,6 +41,16 @@ let GlobalExceptionFilter = class GlobalExceptionFilter {
                 message = exception.message;
                 code = exception.code;
                 break;
+            case common_1.BadRequestException:
+                status = common_1.HttpStatus.BAD_REQUEST;
+                message = exception.message;
+                code = exception.code;
+                break;
+            case common_1.ForbiddenException:
+                status = common_1.HttpStatus.FORBIDDEN;
+                message = exception.message;
+                code = exception.code;
+                break;
             default:
                 status = common_1.HttpStatus.INTERNAL_SERVER_ERROR;
         }

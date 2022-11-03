@@ -27,11 +27,30 @@ export class ProjectService {
   ) { }
 
   async create(createProjectDto: CreateProjectDto, agentID: number) {
+    console.log(createProjectDto.tenantID)
     try {
       const agent = await this.agentService.getById(agentID);
       if (agent.isOwner){
-        const newProject = this.projectRepository.create(createProjectDto)
-        
+        const newProject = this.projectRepository.create({
+          projectName: createProjectDto.projectName,
+          pbx_domain: createProjectDto.pbx_domain,
+          description: createProjectDto.description,
+        })
+        const listAttribute = createProjectDto.attribute;
+        listAttribute.forEach(async attributeElement => {
+          const newAttribute = await this.attributeRepository.create({
+            attributeName: attributeElement.key
+          })
+          await this.projectAttributeRepository.create({
+            attributeID: newAttribute.id,
+            projectID: newProject.id,
+            value: attributeElement.value
+          })
+        })
+        const time = new Date()
+        newProject.updatedAt = time;
+        newProject.createAt = time;
+        this.projectRepository.save(newProject);
       } else {
         throw new ForbiddenException('Access denied')
       }
@@ -42,12 +61,15 @@ export class ProjectService {
 
   }
 
-  async getListProject(pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>> {
+  async getListProject(tenantID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>> {
     const queryBuilder = this.projectRepository.createQueryBuilder("project");
     queryBuilder
+      // .where("project.tenant_id like :id", {id: `%${tenantID}%`})
+      .where("project.tenant_id = :q", {q: tenantID })
       .orderBy("project.createAt", pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
       .take(pageOptionsDto.take)
+      .getMany()
     const itemCount = await queryBuilder.getCount()
     const { entities } = await queryBuilder.getRawAndEntities();
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
@@ -66,7 +88,7 @@ export class ProjectService {
 
   async getById(projectID: number, tenantID: string) {
     try {
-      return this.projectRepository.findOneOrFail({
+      return this.projectRepository.findOne({
         where: {
           tenantID: tenantID,
           id: projectID,
@@ -78,6 +100,7 @@ export class ProjectService {
   }
 
   async update(tenantID: string, id: number, updateProjectDto: UpdateProjectDto) {
+    console.log(tenantID)
     const updateProject = await this.getById(id, tenantID);
     try {
       updateProject.projectName = updateProjectDto.projectName;
@@ -87,7 +110,6 @@ export class ProjectService {
         if (attributeElement === null || typeof (attributeElement) == null) {
           //sentAttribute.id is null => create new
           const newAttribute = await this.attributeRepository.create({
-            id: attributeElement.id, //id = timestamp 
             attributeName: attributeElement.key
           })
           await this.projectAttributeRepository.create({
@@ -115,7 +137,7 @@ export class ProjectService {
         }
       })
       updateProject.updatedAt = new Date()
-      return this.projectRepository.update(id, updateProject)
+      return this.projectRepository.save(updateProject)
     } catch (error) {
       throw error
     }

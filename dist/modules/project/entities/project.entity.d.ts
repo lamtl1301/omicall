@@ -5,7 +5,7 @@ import { Customer } from "src/modules/customer/entities/customer.entity";
 import { Tenant } from "src/modules/tenant/entities/tenant.entity";
 export declare class Project extends BaseEntity {
     projectName: string;
-    domain: string;
+    pbx_domain: string;
     description: string;
     isDeleted: boolean;
     isEnabled: boolean;

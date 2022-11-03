@@ -20,7 +20,7 @@ const tenant_entity_1 = require("../../tenant/entities/tenant.entity");
 const typeorm_1 = require("typeorm");
 let Project = class Project extends base_entity_1.BaseEntity {
     static _OPENAPI_METADATA_FACTORY() {
-        return { projectName: { required: true, type: () => String }, domain: { required: true, type: () => String }, description: { required: true, type: () => String }, isDeleted: { required: true, type: () => Boolean }, isEnabled: { required: true, type: () => Boolean }, tenantID: { required: true, type: () => String } };
+        return { projectName: { required: true, type: () => String }, pbx_domain: { required: true, type: () => String }, description: { required: true, type: () => String }, isDeleted: { required: true, type: () => Boolean }, isEnabled: { required: true, type: () => Boolean }, tenantID: { required: true, type: () => String } };
     }
 };
 __decorate([
@@ -32,7 +32,7 @@ __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Project.prototype, "domain", void 0);
+], Project.prototype, "pbx_domain", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, typeorm_1.Column)(),

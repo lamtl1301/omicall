@@ -12,14 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Attribute = void 0;
 const openapi = require("@nestjs/swagger");
 const typeorm_1 = require("typeorm");
+const agent_attribute_entity_1 = require("./agent-attribute.entity");
 const project_attribute_entity_1 = require("./project-attribute.entity");
 let Attribute = class Attribute {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => Number }, attributeName: { required: true, type: () => String }, projectAttribute: { required: true, type: () => [require("./project-attribute.entity").ProjectAttribute] } };
+        return { id: { required: true, type: () => Number }, attributeName: { required: true, type: () => String }, projectAttribute: { required: true, type: () => [require("./project-attribute.entity").ProjectAttribute] }, agentAttribute: { required: true, type: () => [require("./agent-attribute.entity").AgentAttribute] } };
     }
 };
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
+    (0, typeorm_1.PrimaryGeneratedColumn)('increment'),
     __metadata("design:type", Number)
 ], Attribute.prototype, "id", void 0);
 __decorate([
@@ -30,6 +31,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(type => project_attribute_entity_1.ProjectAttribute, (projectAttribute) => projectAttribute.attribute),
     __metadata("design:type", Array)
 ], Attribute.prototype, "projectAttribute", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(type => agent_attribute_entity_1.AgentAttribute, (agentAttribute) => agentAttribute.attribute),
+    __metadata("design:type", Array)
+], Attribute.prototype, "agentAttribute", void 0);
 Attribute = __decorate([
     (0, typeorm_1.Entity)()
 ], Attribute);

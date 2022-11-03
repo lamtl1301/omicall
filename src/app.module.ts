@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -37,4 +37,5 @@ import { RoleModule } from './modules/role/role.module';
     provide: APP_GUARD, useClass: JwtAuthGuard
   }],
 })
-export class AppModule {}
+export class AppModule {
+}

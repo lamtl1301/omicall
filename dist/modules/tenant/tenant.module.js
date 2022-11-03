@@ -13,13 +13,18 @@ const tenant_controller_1 = require("./tenant.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const tenant_entity_1 = require("./entities/tenant.entity");
 const role_entity_1 = require("../role/entities/role.entity");
+const agent_service_1 = require("../agent/agent.service");
+const agent_entity_1 = require("../agent/entities/agent.entity");
+const agent_attribute_entity_1 = require("../attribute/entities/agent-attribute.entity");
+const attribute_entity_1 = require("../attribute/entities/attribute.entity");
+const project_attribute_entity_1 = require("../attribute/entities/project-attribute.entity");
 let TenantModule = class TenantModule {
 };
 TenantModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([tenant_entity_1.Tenant, role_entity_1.Role])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([tenant_entity_1.Tenant, role_entity_1.Role, agent_entity_1.Agent, attribute_entity_1.Attribute, agent_attribute_entity_1.AgentAttribute, project_attribute_entity_1.ProjectAttribute])],
         controllers: [tenant_controller_1.TenantController],
-        providers: [tenant_service_1.TenantService],
+        providers: [tenant_service_1.TenantService, agent_service_1.AgentService],
         exports: [tenant_service_1.TenantService]
     })
 ], TenantModule);

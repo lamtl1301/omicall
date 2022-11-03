@@ -15,10 +15,11 @@ import { AgentRole } from '../role/entities/agent-role.entity';
 import { ProjectService } from '../project/project.service';
 import { Project } from '../project/entities/project.entity';
 import { ProjectAttribute } from '../attribute/entities/project-attribute.entity';
+import { Tenant } from '../tenant/entities/tenant.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Agent, Role, Token, AgentAttribute, Attribute, AgentRole, Project, ProjectAttribute]),
+  imports: [TypeOrmModule.forFeature([Agent, Role, Token, AgentAttribute, Attribute, AgentRole, Project, ProjectAttribute, Tenant]),
     forwardRef(() => RoleModule),
     forwardRef(() => ProjectModule) ,
     forwardRef(() => AttributeModule) ,

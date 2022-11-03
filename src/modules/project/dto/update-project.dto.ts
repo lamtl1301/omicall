@@ -1,11 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsArray, IsBoolean, IsString } from "class-validator"
+import { IsArray, IsBoolean, IsNumber, IsString } from "class-validator"
 import { Attribute } from "src/common/attribute.type"
 
 import { Column } from "typeorm"
 
 
 export class UpdateProjectDto{
+
+    @ApiProperty()
+    @IsNumber()
+    tenantID: string 
+
     @ApiProperty()
     @IsString()
     projectName: string

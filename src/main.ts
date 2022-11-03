@@ -4,9 +4,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-
+import { json } from 'body-parser';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
-import { AgentService } from './modules/agent/agent.service';
 import { FormDataPipe } from './pipe/form-data.pipe';
 
 
@@ -31,8 +30,9 @@ async function bootstrap() {
   })
 
   app.useGlobalFilters(new GlobalExceptionFilter())
-  app.useGlobalPipes(new FormDataPipe())
-  app.useGlobalPipes(new ValidationPipe({ transform: true }))
+  // app.useGlobalPipes(new FormDataPipe())
+   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
+  app.use(json());
   await app.listen(port)
 }
 bootstrap();

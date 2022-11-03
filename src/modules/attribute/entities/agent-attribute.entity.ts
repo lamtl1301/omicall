@@ -13,7 +13,7 @@ export class AgentAttribute extends BaseAttribute{
     @Column({name: "display_index"})
     displayIndex: number
 
-    @ManyToOne(type => Attribute, (attribute) => attribute.projectAttribute)
+    @ManyToOne(type => Attribute, (attribute) => attribute.agentAttribute)
     @JoinColumn({name: "attribute_id"})
     attribute: Attribute
 

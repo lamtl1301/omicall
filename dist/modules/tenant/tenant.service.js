@@ -18,36 +18,71 @@ const typeorm_1 = require("@nestjs/typeorm");
 const page_meta_dto_1 = require("../../common/page-meta.dto");
 const pagination_dto_1 = require("../../common/pagination.dto");
 const typeorm_2 = require("typeorm");
+const agent_service_1 = require("../agent/agent.service");
 const role_entity_1 = require("../role/entities/role.entity");
 const tenant_entity_1 = require("./entities/tenant.entity");
 let TenantService = class TenantService {
-    constructor(tenantRepository, roleRepository) {
+    constructor(tenantRepository, roleRepository, agentService) {
         this.tenantRepository = tenantRepository;
         this.roleRepository = roleRepository;
+        this.agentService = agentService;
     }
-    async create(createTenantDto) {
+    async create(userID, createTenantDto) {
         try {
-            const tenant = this.tenantRepository.create(createTenantDto);
-            return this.tenantRepository.save(tenant);
+            const agent = await this.agentService.getById(userID);
+            const agentTenant = await this.findById(agent.tenantID);
+            if (agentTenant && agentTenant.isVihat == true) {
+                const checkTenant = await this.findById(createTenantDto.id);
+                if (checkTenant) {
+                    throw new common_1.BadRequestException('Tenant ID is existed');
+                }
+                else {
+                    const tenant = this.tenantRepository.create({
+                        id: createTenantDto.id,
+                        fullName: createTenantDto.full_name,
+                        description: createTenantDto.description,
+                        nation: createTenantDto.nation,
+                        language: createTenantDto.language
+                    });
+                    this.tenantRepository.save(tenant);
+                    return { tenant };
+                }
+            }
+            else {
+                throw new common_1.ForbiddenException('Access denied');
+            }
         }
         catch (error) {
             throw error;
         }
     }
-    async getListTenant(pageOptionsDto) {
-        const queryBuilder = this.tenantRepository.createQueryBuilder("tenant");
-        queryBuilder
-            .orderBy("tenant.createAt", pageOptionsDto.order)
-            .skip(pageOptionsDto.skip)
-            .take(pageOptionsDto.take);
-        const itemCount = await queryBuilder.getCount();
-        const { entities } = await queryBuilder.getRawAndEntities();
-        const pageMetaDto = new page_meta_dto_1.PageMetaDto({ itemCount, pageOptionsDto });
-        return new pagination_dto_1.PageDto(entities, pageMetaDto);
+    async getListTenant(pageOptionsDto, userID) {
+        try {
+            const agent = await this.agentService.getById(userID);
+            const tenant = await this.findById(agent.tenantID);
+            if (tenant && tenant.isVihat == true) {
+                const queryBuilder = this.tenantRepository.createQueryBuilder("tenant");
+                queryBuilder
+                    .orderBy("tenant.createAt", pageOptionsDto.order)
+                    .skip(pageOptionsDto.skip)
+                    .take(pageOptionsDto.take)
+                    .getMany();
+                const itemCount = await queryBuilder.getCount();
+                const { entities } = await queryBuilder.getRawAndEntities();
+                const pageMetaDto = new page_meta_dto_1.PageMetaDto({ itemCount, pageOptionsDto });
+                return new pagination_dto_1.PageDto(entities, pageMetaDto);
+            }
+            else {
+                throw new common_1.ForbiddenException('Access denied');
+            }
+        }
+        catch (error) {
+            throw error;
+        }
     }
     async findById(id) {
         try {
-            return this.tenantRepository.findOneByOrFail({ id });
+            return this.tenantRepository.findOneBy({ id });
         }
         catch (error) {
             throw error;
@@ -80,7 +115,8 @@ TenantService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(tenant_entity_1.Tenant)),
     __param(1, (0, typeorm_1.InjectRepository)(role_entity_1.Role)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        agent_service_1.AgentService])
 ], TenantService);
 exports.TenantService = TenantService;
 //# sourceMappingURL=tenant.service.js.map

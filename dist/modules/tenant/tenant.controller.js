@@ -20,18 +20,20 @@ const create_tenant_dto_1 = require("./dto/create-tenant.dto");
 const update_tenant_dto_1 = require("./dto/update-tenant.dto");
 const swagger_1 = require("@nestjs/swagger");
 const page_option_dto_1 = require("../../common/dto/page-option.dto");
+const user_decorator_1 = require("../../decorator/user.decorator");
 let TenantController = class TenantController {
     constructor(tenantService) {
         this.tenantService = tenantService;
     }
-    getListTenant(pageOptionsDto) {
-        return this.tenantService.getListTenant(pageOptionsDto);
+    getListTenant(userID, pageOptionsDto) {
+        return this.tenantService.getListTenant(pageOptionsDto, userID);
     }
     getTenant(id) {
         return this.tenantService.findById(id);
     }
-    create(createTenantDto) {
-        return this.tenantService.create(createTenantDto);
+    create(userID, createTenantDto) {
+        console.log(createTenantDto instanceof create_tenant_dto_1.CreateTenantDto);
+        return this.tenantService.create(userID, createTenantDto);
     }
     update(id, updateTenantDto) {
         return this.tenantService.update(id, updateTenantDto);
@@ -43,9 +45,10 @@ let TenantController = class TenantController {
 __decorate([
     (0, common_1.Get)(),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Query)()),
+    __param(0, (0, user_decorator_1.User)('id')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [page_option_dto_1.PageOptionsDto]),
+    __metadata("design:paramtypes", [Number, page_option_dto_1.PageOptionsDto]),
     __metadata("design:returntype", Promise)
 ], TenantController.prototype, "getListTenant", null);
 __decorate([
@@ -58,10 +61,11 @@ __decorate([
 ], TenantController.prototype, "getTenant", null);
 __decorate([
     (0, common_1.Post)(),
-    openapi.ApiResponse({ status: 201, type: require("./entities/tenant.entity").Tenant }),
-    __param(0, (0, common_1.Body)()),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, user_decorator_1.User)('id')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_tenant_dto_1.CreateTenantDto]),
+    __metadata("design:paramtypes", [Number, create_tenant_dto_1.CreateTenantDto]),
     __metadata("design:returntype", void 0)
 ], TenantController.prototype, "create", null);
 __decorate([
@@ -82,9 +86,9 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], TenantController.prototype, "remove", null);
 TenantController = __decorate([
-    (0, swagger_1.ApiTags)('Tenants'),
+    (0, swagger_1.ApiTags)('Tenant'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.Controller)('tenants'),
+    (0, common_1.Controller)('tenant'),
     __metadata("design:paramtypes", [tenant_service_1.TenantService])
 ], TenantController);
 exports.TenantController = TenantController;

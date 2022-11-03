@@ -15,7 +15,7 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateAgentDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { password: { required: true, type: () => String }, email: { required: true, type: () => String }, full_name: { required: true, type: () => String }, gender: { required: true, type: () => String } };
+        return { password: { required: true, type: () => String }, email: { required: true, type: () => String } };
     }
 }
 __decorate([
@@ -28,15 +28,5 @@ __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
 ], CreateAgentDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", String)
-], CreateAgentDto.prototype, "full_name", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", String)
-], CreateAgentDto.prototype, "gender", void 0);
 exports.CreateAgentDto = CreateAgentDto;
 //# sourceMappingURL=create-agent.dto.js.map

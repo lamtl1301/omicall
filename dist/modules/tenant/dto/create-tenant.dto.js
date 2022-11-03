@@ -15,9 +15,14 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateTenantDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { full_name: { required: true, type: () => String }, description: { required: true, type: () => String }, nation: { required: true, type: () => String }, language: { required: true, type: () => String } };
+        return { id: { required: true, type: () => String }, full_name: { required: true, type: () => String }, description: { required: true, type: () => String }, nation: { required: true, type: () => String }, language: { required: true, type: () => String } };
     }
 }
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "id", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, swagger_1.ApiProperty)(),
@@ -29,7 +34,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "description", void 0);
 __decorate([
-    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsString)(),
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "nation", void 0);

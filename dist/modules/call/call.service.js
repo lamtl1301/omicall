@@ -18,12 +18,10 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const agent_service_1 = require("../agent/agent.service");
 const call_entity_1 = require("./entities/call.entity");
-const file_type_entity_1 = require("./entities/file-type.entity");
 const file_entity_1 = require("./entities/file.entity");
 let CallService = class CallService {
-    constructor(historyRepository, fileTypeRepository, fileRecordRepository, agentService) {
+    constructor(historyRepository, fileRecordRepository, agentService) {
         this.historyRepository = historyRepository;
-        this.fileTypeRepository = fileTypeRepository;
         this.fileRecordRepository = fileRecordRepository;
         this.agentService = agentService;
     }
@@ -44,10 +42,8 @@ let CallService = class CallService {
 CallService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(call_entity_1.HistoryCall)),
-    __param(1, (0, typeorm_1.InjectRepository)(file_type_entity_1.FileType)),
-    __param(2, (0, typeorm_1.InjectRepository)(file_entity_1.FileRecord)),
+    __param(1, (0, typeorm_1.InjectRepository)(file_entity_1.FileRecord)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository,
         typeorm_2.Repository,
         agent_service_1.AgentService])
 ], CallService);

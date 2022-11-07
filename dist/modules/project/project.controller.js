@@ -25,11 +25,10 @@ let ProjectController = class ProjectController {
     constructor(projectService) {
         this.projectService = projectService;
     }
-    create(createProjectDto, agentID) {
-        return this.projectService.create(createProjectDto, agentID);
+    create(createProjectDto, agentID, tenantID) {
+        return this.projectService.create(createProjectDto, agentID, tenantID);
     }
     async getListProject(tenantID, pageOptionsDto) {
-        console.log("tenantID", tenantID);
         return this.projectService.getListProject(tenantID, pageOptionsDto);
     }
     findOne(projectID, tenant_id) {
@@ -44,11 +43,12 @@ let ProjectController = class ProjectController {
 };
 __decorate([
     (0, common_1.Post)(),
-    openapi.ApiResponse({ status: 201 }),
+    openapi.ApiResponse({ status: 201, type: require("./entities/project.entity").Project }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Query)()),
+    __param(1, (0, user_decorator_1.User)('id')),
+    __param(2, (0, user_decorator_1.User)('tenantID')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_project_dto_1.CreateProjectDto, Number]),
+    __metadata("design:paramtypes", [create_project_dto_1.CreateProjectDto, Number, String]),
     __metadata("design:returntype", void 0)
 ], ProjectController.prototype, "create", null);
 __decorate([

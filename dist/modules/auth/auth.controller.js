@@ -22,6 +22,7 @@ const prelogin_dto_1 = require("./dto/prelogin.dto");
 const logout_dto_1 = require("./dto/logout.dto");
 const refresh_token_dto_1 = require("./dto/refresh-token.dto");
 const login_dto_1 = require("./dto/login.dto");
+const verify_token_dto_1 = require("./dto/verify-token.dto");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -37,6 +38,9 @@ let AuthController = class AuthController {
     }
     async logout(LogoutDto) {
         return await this.authService.logout(LogoutDto.agent_id);
+    }
+    async confirm(verifyEmailToken) {
+        return await this.authService.verifyEmail(verifyEmailToken.token);
     }
 };
 __decorate([
@@ -71,6 +75,14 @@ __decorate([
     __metadata("design:paramtypes", [logout_dto_1.LogoutDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Post)('confirm'),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [verify_token_dto_1.VerifyEmailToken]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "confirm", null);
 AuthController = __decorate([
     (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),

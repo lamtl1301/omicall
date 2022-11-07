@@ -18,13 +18,25 @@ const agent_entity_1 = require("../agent/entities/agent.entity");
 const agent_attribute_entity_1 = require("../attribute/entities/agent-attribute.entity");
 const attribute_entity_1 = require("../attribute/entities/attribute.entity");
 const project_attribute_entity_1 = require("../attribute/entities/project-attribute.entity");
+const project_service_1 = require("../project/project.service");
+const project_entity_1 = require("../project/entities/project.entity");
+const customer_entity_1 = require("../customer/entities/customer.entity");
+const customer_number_entity_1 = require("../phone-number/entities/customer-number.entity");
+const phone_number_entity_1 = require("../phone-number/entities/phone-number.entity");
+const project_module_1 = require("../project/project.module");
+const role_service_1 = require("../role/role.service");
+const agent_role_entity_1 = require("../role/entities/agent-role.entity");
 let TenantModule = class TenantModule {
 };
 TenantModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([tenant_entity_1.Tenant, role_entity_1.Role, agent_entity_1.Agent, attribute_entity_1.Attribute, agent_attribute_entity_1.AgentAttribute, project_attribute_entity_1.ProjectAttribute])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([tenant_entity_1.Tenant, role_entity_1.Role, agent_entity_1.Agent, attribute_entity_1.Attribute, agent_attribute_entity_1.AgentAttribute,
+                project_attribute_entity_1.ProjectAttribute, project_entity_1.Project, customer_entity_1.Customer, customer_number_entity_1.CustomerNumber, phone_number_entity_1.PhoneNumber, agent_role_entity_1.AgentRole
+            ]),
+            (0, common_1.forwardRef)(() => project_module_1.ProjectModule),
+        ],
         controllers: [tenant_controller_1.TenantController],
-        providers: [tenant_service_1.TenantService, agent_service_1.AgentService],
+        providers: [tenant_service_1.TenantService, agent_service_1.AgentService, project_service_1.ProjectService, role_service_1.RoleService],
         exports: [tenant_service_1.TenantService]
     })
 ], TenantModule);

@@ -7,7 +7,7 @@ import { Project } from './entities/project.entity';
 export declare class ProjectController {
     private readonly projectService;
     constructor(projectService: ProjectService);
-    create(createProjectDto: CreateProjectDto, agentID: number): Promise<void>;
+    create(createProjectDto: CreateProjectDto, agentID: number, tenantID: string): Promise<Project>;
     getListProject(tenantID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>>;
     findOne(projectID: number, tenant_id: string): Promise<Project>;
     update(tenantID: string, id: number, updateProjectDto: UpdateProjectDto): Promise<Project>;

@@ -13,6 +13,7 @@ export declare class TokenService {
     createJWTToken(id: number, expire: Moment): Promise<string>;
     createToken(id: number, type: TokenType): Promise<string>;
     createRefreshToken(agent_id: number): Promise<string>;
+    createVerifyToken(agent_id: number): Promise<string>;
     verifyJWTToken(token: string): Promise<JWTPayload>;
     createAuthToken(id: number): Promise<{
         accessToken: string;
@@ -22,6 +23,7 @@ export declare class TokenService {
         accessToken: string;
         refreshToken: string;
     }>;
-    getTokenByID(agent_id: number, type: TokenType): Promise<Token>;
-    remove(agent_id: number): Promise<void>;
+    getTokenByAgentID(agent_id: number, type: TokenType): Promise<Token>;
+    remove(agent_id: number, type: TokenType): Promise<void>;
+    verifyToken(token: string, type: TokenType): Promise<boolean>;
 }

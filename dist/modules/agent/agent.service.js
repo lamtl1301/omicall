@@ -26,12 +26,16 @@ const pagination_dto_1 = require("../../common/pagination.dto");
 const page_meta_dto_1 = require("../../common/page-meta.dto");
 const agent_attribute_entity_1 = require("../attribute/entities/agent-attribute.entity");
 const attribute_entity_1 = require("../attribute/entities/attribute.entity");
+const mail_service_1 = require("../mail/mail.service");
+const tenant_service_1 = require("../tenant/tenant.service");
 let AgentService = class AgentService {
-    constructor(agentRepository, roleRepository, agentAttributeRepository, attributeRepository) {
+    constructor(agentRepository, roleRepository, agentAttributeRepository, attributeRepository, tenantService, mailService) {
         this.agentRepository = agentRepository;
         this.roleRepository = roleRepository;
         this.agentAttributeRepository = agentAttributeRepository;
         this.attributeRepository = attributeRepository;
+        this.tenantService = tenantService;
+        this.mailService = mailService;
     }
     async createAgent(tenantID, createAgentDto) {
         try {
@@ -41,41 +45,49 @@ let AgentService = class AgentService {
                     tenantID: tenantID
                 }
             });
-            if (checkAgent) {
-                checkAgent.isActived = true;
-                checkAgent.isDeleted = false;
-                return this.agentRepository.save(checkAgent);
+            if (checkAgent && !checkAgent.isDeleted && checkAgent.isActived) {
+                throw new common_1.BadRequestException('Agent is actived in tenant');
             }
             else {
                 const agent = this.agentRepository.create({
                     email: createAgentDto.email,
-                    password: createAgentDto.password
+                    password: createAgentDto.password,
+                    tenantID: tenantID
                 });
-                let password = agent.password;
-                if (agent.password.length == 0) {
+                let password = createAgentDto.password;
+                if (password.trim().length == 0) {
                     password = Math.random().toString(36).slice(-8);
+                    agent.isFirstLogin = false;
                 }
                 else {
-                    agent.isFirstLogin = false;
+                    agent.isFirstLogin = true;
                 }
                 console.log(password);
                 let hashedPassword = await bcrypt_1.default.hash(password, 12);
                 agent.password = hashedPassword;
                 agent.createAt = new Date();
                 agent.updatedAt = new Date();
-                return this.agentRepository.save(agent);
+                const createdAgent = await this.agentRepository.save(agent);
+                const tenant = await this.tenantService.findById(agent.tenantID);
+                const tenantName = tenant.fullName;
+                return { createdAgent, tenantName, password };
             }
         }
         catch (error) {
             throw error;
         }
     }
-    async getAll() {
-        return this.agentRepository;
+    async getListAgentOfTenant(tenantID) {
+        return this.agentRepository.find({
+            where: {
+                tenantID: tenantID
+            }
+        });
     }
-    async getListAgent(pageOptionsDto) {
+    async getListAgent(tenantID, pageOptionsDto) {
         const queryBuilder = this.agentRepository.createQueryBuilder("agent");
         queryBuilder
+            .where("agent.tenant_id = :q", { q: tenantID })
             .orderBy("agent.createAt", pageOptionsDto.order)
             .skip(pageOptionsDto.skip)
             .take(pageOptionsDto.take);
@@ -183,6 +195,13 @@ let AgentService = class AgentService {
             throw error;
         }
     }
+    async activedAgent(agentID) {
+        const agent = await this.getById(agentID);
+        if (agent) {
+            agent.isActived = true;
+            return await this.agentRepository.save(agent);
+        }
+    }
 };
 AgentService = __decorate([
     (0, common_1.Injectable)(),
@@ -190,10 +209,13 @@ AgentService = __decorate([
     __param(1, (0, typeorm_1.InjectRepository)(role_entity_1.Role)),
     __param(2, (0, typeorm_1.InjectRepository)(agent_attribute_entity_1.AgentAttribute)),
     __param(3, (0, typeorm_1.InjectRepository)(attribute_entity_1.Attribute)),
+    __param(4, (0, common_1.Inject)((0, common_1.forwardRef)(() => tenant_service_1.TenantService))),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        tenant_service_1.TenantService,
+        mail_service_1.MailService])
 ], AgentService);
 exports.AgentService = AgentService;
 //# sourceMappingURL=agent.service.js.map

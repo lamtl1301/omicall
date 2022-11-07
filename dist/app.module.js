@@ -23,6 +23,7 @@ const phone_number_module_1 = require("./modules/phone-number/phone-number.modul
 const project_module_1 = require("./modules/project/project.module");
 const call_module_1 = require("./modules/call/call.module");
 const role_module_1 = require("./modules/role/role.module");
+const mail_module_1 = require("./modules/mail/mail.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -38,6 +39,7 @@ AppModule = __decorate([
             project_module_1.ProjectModule,
             call_module_1.CallModule,
             role_module_1.RoleModule,
+            mail_module_1.MailModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService,

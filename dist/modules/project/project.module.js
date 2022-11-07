@@ -25,17 +25,23 @@ const attribute_module_1 = require("../attribute/attribute.module");
 const role_entity_1 = require("../role/entities/role.entity");
 const agent_attribute_entity_1 = require("../attribute/entities/agent-attribute.entity");
 const agent_role_entity_1 = require("../role/entities/agent-role.entity");
+const tenant_service_1 = require("../tenant/tenant.service");
+const customer_number_entity_1 = require("../phone-number/entities/customer-number.entity");
+const phone_number_entity_1 = require("../phone-number/entities/phone-number.entity");
+const tenant_module_1 = require("../tenant/tenant.module");
 let ProjectModule = class ProjectModule {
 };
 ProjectModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([project_entity_1.Project, customer_entity_1.Customer, tenant_entity_1.Tenant, agent_entity_1.Agent, project_attribute_entity_1.ProjectAttribute, attribute_entity_1.Attribute, role_entity_1.Role, agent_attribute_entity_1.AgentAttribute, agent_role_entity_1.AgentRole]),
-            (0, common_1.forwardRef)(() => role_module_1.RoleModule),
+        imports: [typeorm_1.TypeOrmModule.forFeature([project_entity_1.Project, customer_entity_1.Customer, tenant_entity_1.Tenant, agent_entity_1.Agent,
+                project_attribute_entity_1.ProjectAttribute, attribute_entity_1.Attribute, role_entity_1.Role, agent_attribute_entity_1.AgentAttribute, agent_role_entity_1.AgentRole, customer_number_entity_1.CustomerNumber, phone_number_entity_1.PhoneNumber]),
             (0, common_1.forwardRef)(() => agent_module_1.AgentModule),
+            (0, common_1.forwardRef)(() => role_module_1.RoleModule),
             (0, common_1.forwardRef)(() => attribute_module_1.AttributeModule),
+            (0, common_1.forwardRef)(() => tenant_module_1.TenantModule)
         ],
         controllers: [project_controller_1.ProjectController],
-        providers: [project_service_1.ProjectService, agent_service_1.AgentService, role_service_1.RoleService],
+        providers: [project_service_1.ProjectService, agent_service_1.AgentService, role_service_1.RoleService, tenant_service_1.TenantService],
         exports: [project_service_1.ProjectService]
     })
 ], ProjectModule);

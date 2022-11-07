@@ -16,15 +16,22 @@ import { AttributeModule } from '../attribute/attribute.module';
 import { Role } from '../role/entities/role.entity';
 import { AgentAttribute } from '../attribute/entities/agent-attribute.entity';
 import { AgentRole } from '../role/entities/agent-role.entity';
+import { TenantService } from '../tenant/tenant.service';
+import { CustomerNumber } from '../phone-number/entities/customer-number.entity';
+import { PhoneNumber } from '../phone-number/entities/phone-number.entity';
+import { TenantModule } from '../tenant/tenant.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project, Customer, Tenant, Agent, ProjectAttribute, Attribute, Role, AgentAttribute, AgentRole]),
-    forwardRef(() => RoleModule) ,
-    forwardRef(() => AgentModule) ,
+  imports: [TypeOrmModule.forFeature([Project, Customer, Tenant, Agent, 
+    ProjectAttribute, Attribute, Role, AgentAttribute, AgentRole, CustomerNumber, PhoneNumber]),
+    forwardRef(() => AgentModule),
+    forwardRef(() => RoleModule),
     forwardRef(() => AttributeModule) ,
+    forwardRef(() => TenantModule)
   ],
+  
   controllers: [ProjectController],
-  providers: [ProjectService, AgentService, RoleService],
+  providers: [ProjectService, AgentService, RoleService, TenantService],
   exports: [ProjectService]
 })
 export class ProjectModule {}

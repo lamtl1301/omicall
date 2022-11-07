@@ -35,12 +35,17 @@ export class TenantController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTenantDto: UpdateTenantDto) {
-    return this.tenantService.update(id, updateTenantDto);
+  update(@Param('tenantID') tenantID: string, 
+    @Body() updateTenantDto: UpdateTenantDto,
+    @User('id') userID : number
+    ) {
+    return this.tenantService.update(tenantID, updateTenantDto, userID);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tenantService.remove(id);
+  remove(@Param('tenantID') tenantID: string,
+    @User('id') userID: number
+  ) {
+    return this.tenantService.remove(tenantID, userID);
   }
 }

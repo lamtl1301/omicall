@@ -5,12 +5,10 @@ export class CreateAgentDto {
 
     @IsString()
     @ApiProperty()
-    readonly password: string
+    readonly email: string
 
     @IsString()
     @ApiProperty()
-    readonly email: string
-
-
+    readonly password: string
     
 }

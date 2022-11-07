@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,15 +22,21 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const token_service_1 = require("./token/token.service");
+const token_entity_1 = require("./entities/token.entity");
 const project_service_1 = require("../project/project.service");
 const tenant_service_1 = require("../tenant/tenant.service");
+const mail_service_1 = require("../mail/mail.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
 let AuthService = class AuthService {
-    constructor(agentService, tokenService, projectService, tenantService, jwtService, configService) {
+    constructor(agentService, tokenService, projectService, tenantService, mailService, jwtService, tokenRepositoy, configService) {
         this.agentService = agentService;
         this.tokenService = tokenService;
         this.projectService = projectService;
         this.tenantService = tenantService;
+        this.mailService = mailService;
         this.jwtService = jwtService;
+        this.tokenRepositoy = tokenRepositoy;
         this.configService = configService;
     }
     async validateUser(id) {
@@ -44,7 +53,7 @@ let AuthService = class AuthService {
                     return { user, token };
                 }
                 else {
-                    const listProject = await this.projectService.getListProjectOfAgent(user);
+                    const listProject = await this.projectService.getListProjectOfTenant(user.tenantID);
                     return { user, tenant, listProject };
                 }
             }
@@ -81,7 +90,30 @@ let AuthService = class AuthService {
     }
     async logout(agent_id) {
         try {
-            return this.tokenService.remove(agent_id);
+            return this.tokenService.remove(agent_id, token_entity_1.TokenType.REFRESH_TOKEN);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    async verifyEmail(verifyToken) {
+        try {
+            console.log("verifyToken", verifyToken);
+            const token = await this.tokenRepositoy.findOneOrFail({
+                where: {
+                    id: verifyToken
+                }
+            });
+            console.log("token", token);
+            const isTokenExpired = await this.tokenService.verifyToken(token.id, token_entity_1.TokenType.VERIFY_EMAIL);
+            console.log("isTokenExpired", isTokenExpired);
+            if (isTokenExpired) {
+                await this.agentService.activedAgent(token.agentID);
+                await this.tokenService.remove(token.agentID, token_entity_1.TokenType.VERIFY_EMAIL);
+            }
+            else {
+                throw new common_1.BadRequestException(' Token is expired');
+            }
         }
         catch (error) {
             throw error;
@@ -90,11 +122,14 @@ let AuthService = class AuthService {
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(6, (0, typeorm_1.InjectRepository)(token_entity_1.Token)),
     __metadata("design:paramtypes", [agent_service_1.AgentService,
         token_service_1.TokenService,
         project_service_1.ProjectService,
         tenant_service_1.TenantService,
+        mail_service_1.MailService,
         jwt_1.JwtService,
+        typeorm_2.Repository,
         config_1.ConfigService])
 ], AuthService);
 exports.AuthService = AuthService;

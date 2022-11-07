@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageMetaDto } from 'src/common/page-meta.dto';
@@ -9,6 +9,7 @@ import { Agent } from '../agent/entities/agent.entity';
 import { Attribute } from '../attribute/entities/attribute.entity';
 import { ProjectAttribute } from '../attribute/entities/project-attribute.entity';
 import { RoleService } from '../role/role.service';
+import { TenantService } from '../tenant/tenant.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
@@ -22,35 +23,44 @@ export class ProjectService {
     private readonly projectAttributeRepository: Repository<ProjectAttribute>,
     @InjectRepository(Attribute)
     private readonly attributeRepository: Repository<Attribute>,
+    @Inject(forwardRef(() => AgentService))
     private readonly agentService: AgentService,
+    @Inject(forwardRef(() => TenantService))
+    private readonly tenantService: TenantService,
     private readonly roleService: RoleService
   ) { }
 
-  async create(createProjectDto: CreateProjectDto, agentID: number) {
-    console.log(createProjectDto.tenantID)
+  async create(createProjectDto: CreateProjectDto, agentID: number, tenantID: string) {
     try {
       const agent = await this.agentService.getById(agentID);
-      if (agent.isOwner){
+      if (agent.isOwner) {
         const newProject = this.projectRepository.create({
           projectName: createProjectDto.projectName,
           pbx_domain: createProjectDto.pbx_domain,
           description: createProjectDto.description,
+          tenantID: tenantID
         })
+        this.projectRepository.save(newProject)
         const listAttribute = createProjectDto.attribute;
-        listAttribute.forEach(async attributeElement => {
-          const newAttribute = await this.attributeRepository.create({
-            attributeName: attributeElement.key
+        if (listAttribute.length > 0){
+          listAttribute.forEach(async attributeElement => {
+            const newAttribute = await this.attributeRepository.create({
+              attributeName: attributeElement.key
+            })
+            this.attributeRepository.save(newAttribute)
+            console.log("aat",newAttribute)
+            const newProjectAtt = this.projectAttributeRepository.create({
+              attributeID: newAttribute.id,
+              projectID: newProject.id,
+              value: attributeElement.value
+            })
+            this.projectAttributeRepository.save(newProjectAtt)
           })
-          await this.projectAttributeRepository.create({
-            attributeID: newAttribute.id,
-            projectID: newProject.id,
-            value: attributeElement.value
-          })
-        })
+        }
         const time = new Date()
         newProject.updatedAt = time;
         newProject.createAt = time;
-        this.projectRepository.save(newProject);
+        return this.projectRepository.save(newProject);
       } else {
         throw new ForbiddenException('Access denied')
       }
@@ -62,24 +72,33 @@ export class ProjectService {
   }
 
   async getListProject(tenantID: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>> {
+    const tenant = await this.tenantService.findById(tenantID);
     const queryBuilder = this.projectRepository.createQueryBuilder("project");
-    queryBuilder
-      // .where("project.tenant_id like :id", {id: `%${tenantID}%`})
-      .where("project.tenant_id = :q", {q: tenantID })
-      .orderBy("project.createAt", pageOptionsDto.order)
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
-      .getMany()
+    if (tenant && tenant.isVihat == true) {
+      queryBuilder
+        .orderBy("project.createAt", pageOptionsDto.order)
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .getMany()
+    } else {
+      queryBuilder
+        // .where("project.tenant_id like :id", {id: `%${tenantID}%`})
+        .where("project.tenant_id = :q", { q: tenantID })
+        .orderBy("project.createAt", pageOptionsDto.order)
+        .skip(pageOptionsDto.skip)
+        .take(pageOptionsDto.take)
+        .getMany()
+    }
     const itemCount = await queryBuilder.getCount()
     const { entities } = await queryBuilder.getRawAndEntities();
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto(entities, pageMetaDto)
   }
 
-  async getListProjectOfAgent(agent: Agent) {
+  async getListProjectOfTenant(tenantID: string) {
     const listProject = this.projectRepository.find({
       where: {
-        tenantID: agent.tenantID,
+        tenantID: tenantID,
 
       }
     })
@@ -100,7 +119,6 @@ export class ProjectService {
   }
 
   async update(tenantID: string, id: number, updateProjectDto: UpdateProjectDto) {
-    console.log(tenantID)
     const updateProject = await this.getById(id, tenantID);
     try {
       updateProject.projectName = updateProjectDto.projectName;
@@ -112,17 +130,19 @@ export class ProjectService {
           const newAttribute = await this.attributeRepository.create({
             attributeName: attributeElement.key
           })
-          await this.projectAttributeRepository.create({
+          this.attributeRepository.save(newAttribute)
+          const newProjectAtt = await this.projectAttributeRepository.create({
             attributeID: newAttribute.id,
             projectID: id,
             value: attributeElement.value
           })
+          this.projectAttributeRepository.save(newProjectAtt)
         } else {
           // sentAttribute.id not null => update record
           const projectAttributeRecord = await this.projectAttributeRepository.findOne({
             where: {
               id: attributeElement.id,
-              projectID: id
+              projectID: id,
             }
           })
           projectAttributeRecord.value = attributeElement.value

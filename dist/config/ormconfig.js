@@ -29,11 +29,11 @@ const typeorm_1 = require("typeorm");
 dotenv.config();
 exports.dataSourceOptions = ({
     type: 'postgres',
-    host: 'localhost',
+    host: 'omicall.cynisqrgpez0.ap-southeast-1.rds.amazonaws.com',
     port: 5432,
     username: 'postgres',
-    password: 'pass123',
-    database: 'omicrm',
+    password: 'se141056',
+    database: 'omicall',
     entities: [__dirname + "/../**/*.entity{.js,.ts}"],
     logging: true,
     synchronize: false,

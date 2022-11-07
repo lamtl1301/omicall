@@ -12,6 +12,6 @@ export declare class TenantController {
     create(userID: number, createTenantDto: CreateTenantDto): Promise<{
         tenant: Tenant;
     }>;
-    update(id: string, updateTenantDto: UpdateTenantDto): Promise<void>;
-    remove(id: string): Promise<void>;
+    update(tenantID: string, updateTenantDto: UpdateTenantDto, userID: number): Promise<void>;
+    remove(tenantID: string, userID: number): Promise<void>;
 }

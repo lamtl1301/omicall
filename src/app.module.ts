@@ -14,6 +14,7 @@ import { PhoneNumberModule } from './modules/phone-number/phone-number.module';
 import { ProjectModule } from './modules/project/project.module';
 import { CallModule } from './modules/call/call.module';
 import { RoleModule } from './modules/role/role.module';
+import { MailModule } from './modules/mail/mail.module';
 
 
 @Module({
@@ -29,6 +30,7 @@ import { RoleModule } from './modules/role/role.module';
     ProjectModule,
     CallModule,
     RoleModule,
+    MailModule,
     
   ],
   controllers: [AppController],

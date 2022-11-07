@@ -16,6 +16,8 @@ import { ProjectService } from '../project/project.service';
 import { Project } from '../project/entities/project.entity';
 import { ProjectAttribute } from '../attribute/entities/project-attribute.entity';
 import { Tenant } from '../tenant/entities/tenant.entity';
+import { TenantModule } from '../tenant/tenant.module';
+import { TenantService } from '../tenant/tenant.service';
 
 
 @Module({
@@ -23,9 +25,10 @@ import { Tenant } from '../tenant/entities/tenant.entity';
     forwardRef(() => RoleModule),
     forwardRef(() => ProjectModule) ,
     forwardRef(() => AttributeModule) ,
+    forwardRef(() => TenantModule)
 ],
   controllers: [AgentController],
-  providers: [AgentService, RoleService, ProjectService],
+  providers: [AgentService, RoleService, ProjectService, TenantService],
   exports: [AgentService]
 })
 export class AgentModule {}

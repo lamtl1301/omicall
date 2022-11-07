@@ -3,6 +3,7 @@ import { PreLoginDto } from './dto/prelogin.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { LoginDto } from './dto/login.dto';
+import { VerifyEmailToken } from './dto/verify-token.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -20,4 +21,5 @@ export declare class AuthController {
         refreshToken: string;
     }>;
     logout(LogoutDto: LogoutDto): Promise<void>;
+    confirm(verifyEmailToken: VerifyEmailToken): Promise<void>;
 }

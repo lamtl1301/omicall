@@ -50,7 +50,7 @@ let TokenService = class TokenService {
             }
             case token_entity_1.TokenType.VERIFY_EMAIL: {
                 expiresIn = (0, moment_1.default)()
-                    .add(this.configService.get('VERIFY_EMAIL_TOKEN_EXPIRATION_MINUTES'), 'day')
+                    .add(this.configService.get('VERIFY_EMAIL_TOKEN_EXPIRATION_DAYS'), 'day')
                     .toDate();
                 break;
             }
@@ -67,16 +67,18 @@ let TokenService = class TokenService {
     async createRefreshToken(agent_id) {
         return this.createToken(agent_id, token_entity_1.TokenType.REFRESH_TOKEN);
     }
+    async createVerifyToken(agent_id) {
+        return this.createToken(agent_id, token_entity_1.TokenType.VERIFY_EMAIL);
+    }
     async verifyJWTToken(token) {
         return this.jwtService.verify(token);
     }
     async createAuthToken(id) {
         const accessTokenExpires = (0, moment_1.default)().add(this.configService.get('ACCESS_TOKEN_EXPIRATION_MINUTES'), 'minutes');
         const accessToken = await this.createJWTToken(id, accessTokenExpires);
-        console.log(accessToken);
         const refreshToken = await this.createRefreshToken(id);
-        console.log(refreshToken);
-        return { accessToken,
+        return {
+            accessToken,
             refreshToken,
         };
     }
@@ -87,15 +89,21 @@ let TokenService = class TokenService {
                     id: refreshToken
                 }
             });
-            const newToken = this.createAuthToken(token.agentID);
-            await this.tokenRepositoy.remove(token);
-            return newToken;
+            const isTokenExpired = await this.verifyToken(token.id, token_entity_1.TokenType.REFRESH_TOKEN);
+            if (isTokenExpired) {
+                const newToken = this.createAuthToken(token.agentID);
+                await this.tokenRepositoy.remove(token);
+                return newToken;
+            }
+            else {
+                throw new common_1.BadRequestException(' Token is expired');
+            }
         }
         catch (error) {
             throw error;
         }
     }
-    async getTokenByID(agent_id, type) {
+    async getTokenByAgentID(agent_id, type) {
         return this.tokenRepositoy.findOneOrFail({
             where: {
                 agentID: agent_id,
@@ -103,13 +111,45 @@ let TokenService = class TokenService {
             }
         });
     }
-    async remove(agent_id) {
+    async remove(agent_id, type) {
         try {
-            const token = await this.getTokenByID(agent_id, token_entity_1.TokenType.REFRESH_TOKEN);
+            const token = await this.getTokenByAgentID(agent_id, type);
             this.tokenRepositoy.remove(token);
         }
         catch (error) {
             throw error;
+        }
+    }
+    async verifyToken(token, type) {
+        const findToken = await this.tokenRepositoy.findOne({
+            where: {
+                id: token,
+                type: type
+            }
+        });
+        if (findToken) {
+            const dateNow = new Date();
+            console.log(dateNow);
+            let exp;
+            switch (type) {
+                case token_entity_1.TokenType.REFRESH_TOKEN: {
+                    exp = this.configService.get('REFRESH_TOKEN_EXPIRATION_DAYS');
+                    break;
+                }
+                case token_entity_1.TokenType.VERIFY_EMAIL: {
+                    exp = this.configService.get('VERIFY_EMAIL_TOKEN_EXPIRATION_DAYS');
+                    break;
+                }
+            }
+            let expDay = findToken.expiresIn;
+            const dayOfExp = Number(expDay.getDate()) + Number(exp);
+            expDay.setDate(dayOfExp);
+            if (expDay.getTime() < dateNow.getTime()) {
+                return false;
+            }
+            else {
+                return true;
+            }
         }
     }
 };

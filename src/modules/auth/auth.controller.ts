@@ -6,6 +6,7 @@ import { PreLoginDto } from './dto/prelogin.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { LoginDto } from './dto/login.dto';
+import { VerifyEmailToken } from './dto/verify-token.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -32,6 +33,10 @@ export class AuthController {
   @Post('logout')
   async logout(@Body() LogoutDto: LogoutDto){
     return await this.authService.logout(LogoutDto.agent_id)
+  }
+  @Post('confirm')
+  async confirm(@Body() verifyEmailToken: VerifyEmailToken){
+    return await this.authService.verifyEmail(verifyEmailToken.token)
   }
 
 }

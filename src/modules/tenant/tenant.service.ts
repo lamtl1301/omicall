@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PageOptionsDto } from 'src/common/dto/page-option.dto';
 import { PageMetaDto } from 'src/common/page-meta.dto';
@@ -6,6 +6,9 @@ import { PageDto } from 'src/common/pagination.dto';
 
 import { Repository } from 'typeorm';
 import { AgentService } from '../agent/agent.service';
+import { Agent } from '../agent/entities/agent.entity';
+import { Project } from '../project/entities/project.entity';
+import { ProjectService } from '../project/project.service';
 import { Role } from '../role/entities/role.entity';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
@@ -18,7 +21,14 @@ export class TenantService {
     private readonly tenantRepository: Repository<Tenant>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
-    private readonly agentService: AgentService
+    @InjectRepository(Agent)
+    private readonly agentRepository: Repository<Agent>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
+    @Inject(forwardRef(() => AgentService))
+    private readonly agentService: AgentService,
+    @Inject(forwardRef(() => ProjectService))
+    private readonly projectService: ProjectService
   ) { }
 
   //admin
@@ -86,12 +96,18 @@ export class TenantService {
 
   }
 
-  async update(id: string, updateTenantDto: UpdateTenantDto) {
+  async update(uTenantID: string, updateTenantDto: UpdateTenantDto, userID: number) {
     try {
-      const tenant = await this.tenantRepository.findOneByOrFail({ id });
-      tenant.fullName = updateTenantDto.full_name;
-      tenant.description = updateTenantDto.description;
-      tenant.nation = updateTenantDto.nation
+      const agent = await this.agentService.getById(userID);
+      const tenant = await this.findById(agent.tenantID);
+      if (tenant && tenant.isVihat == true || agent.isOwner == true){
+        const updateTenant = await this.findById(uTenantID);
+        updateTenant.fullName = updateTenantDto.full_name;
+        updateTenant.description = updateTenantDto.description;
+        updateTenant.nation = updateTenantDto.nation
+      } else {
+        throw new ForbiddenException('Access denied')
+      }
 
     } catch (error) {
       throw error
@@ -99,11 +115,33 @@ export class TenantService {
 
   }
 
-  async remove(id: string) {
+  async remove(deleteTenantID: string, userID: number) {
     try {
-      const tenant = await this.tenantRepository.findOneByOrFail({id})
-      tenant.isDeleted = true;
-      tenant.isEnabled = false;
+      const agent = await this.agentService.getById(userID);
+      const tenant = await this.findById(agent.tenantID);
+      if (tenant && tenant.isVihat == true ) {
+        const deleteTenant = await this.findById(deleteTenantID)
+        deleteTenant.isDeleted = true;
+        deleteTenant.isEnabled = false;
+        this.tenantRepository.save(deleteTenant)
+        // list agent isdeleted => true
+        const listAgentOfTenant = await this.agentService.getListAgentOfTenant(deleteTenantID)
+        listAgentOfTenant.forEach( async agent => {
+          agent.isActived = false;
+          agent.isDeleted = true;
+        })
+        this.agentRepository.save(listAgentOfTenant)
+        // isdeleted of project => true
+        const listProjectOfTenant = await this.projectService.getListProjectOfTenant(deleteTenantID)
+        listProjectOfTenant.forEach(async project => {
+          project.isDeleted = true;
+          project.isEnabled = false;
+        })
+        this.projectRepository.save(listProjectOfTenant)
+      } else {
+        throw new ForbiddenException('Access denied')
+      }
+
     } catch (error) {
       throw error
     }

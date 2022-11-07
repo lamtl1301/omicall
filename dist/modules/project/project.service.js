@@ -22,17 +22,18 @@ const agent_service_1 = require("../agent/agent.service");
 const attribute_entity_1 = require("../attribute/entities/attribute.entity");
 const project_attribute_entity_1 = require("../attribute/entities/project-attribute.entity");
 const role_service_1 = require("../role/role.service");
+const tenant_service_1 = require("../tenant/tenant.service");
 const project_entity_1 = require("./entities/project.entity");
 let ProjectService = class ProjectService {
-    constructor(projectRepository, projectAttributeRepository, attributeRepository, agentService, roleService) {
+    constructor(projectRepository, projectAttributeRepository, attributeRepository, agentService, tenantService, roleService) {
         this.projectRepository = projectRepository;
         this.projectAttributeRepository = projectAttributeRepository;
         this.attributeRepository = attributeRepository;
         this.agentService = agentService;
+        this.tenantService = tenantService;
         this.roleService = roleService;
     }
-    async create(createProjectDto, agentID) {
-        console.log(createProjectDto.tenantID);
+    async create(createProjectDto, agentID, tenantID) {
         try {
             const agent = await this.agentService.getById(agentID);
             if (agent.isOwner) {
@@ -40,22 +41,29 @@ let ProjectService = class ProjectService {
                     projectName: createProjectDto.projectName,
                     pbx_domain: createProjectDto.pbx_domain,
                     description: createProjectDto.description,
+                    tenantID: tenantID
                 });
+                this.projectRepository.save(newProject);
                 const listAttribute = createProjectDto.attribute;
-                listAttribute.forEach(async (attributeElement) => {
-                    const newAttribute = await this.attributeRepository.create({
-                        attributeName: attributeElement.key
+                if (listAttribute.length > 0) {
+                    listAttribute.forEach(async (attributeElement) => {
+                        const newAttribute = await this.attributeRepository.create({
+                            attributeName: attributeElement.key
+                        });
+                        this.attributeRepository.save(newAttribute);
+                        console.log("aat", newAttribute);
+                        const newProjectAtt = this.projectAttributeRepository.create({
+                            attributeID: newAttribute.id,
+                            projectID: newProject.id,
+                            value: attributeElement.value
+                        });
+                        this.projectAttributeRepository.save(newProjectAtt);
                     });
-                    await this.projectAttributeRepository.create({
-                        attributeID: newAttribute.id,
-                        projectID: newProject.id,
-                        value: attributeElement.value
-                    });
-                });
+                }
                 const time = new Date();
                 newProject.updatedAt = time;
                 newProject.createAt = time;
-                this.projectRepository.save(newProject);
+                return this.projectRepository.save(newProject);
             }
             else {
                 throw new common_1.ForbiddenException('Access denied');
@@ -66,22 +74,32 @@ let ProjectService = class ProjectService {
         }
     }
     async getListProject(tenantID, pageOptionsDto) {
+        const tenant = await this.tenantService.findById(tenantID);
         const queryBuilder = this.projectRepository.createQueryBuilder("project");
-        queryBuilder
-            .where("project.tenant_id = :q", { q: tenantID })
-            .orderBy("project.createAt", pageOptionsDto.order)
-            .skip(pageOptionsDto.skip)
-            .take(pageOptionsDto.take)
-            .getMany();
+        if (tenant && tenant.isVihat == true) {
+            queryBuilder
+                .orderBy("project.createAt", pageOptionsDto.order)
+                .skip(pageOptionsDto.skip)
+                .take(pageOptionsDto.take)
+                .getMany();
+        }
+        else {
+            queryBuilder
+                .where("project.tenant_id = :q", { q: tenantID })
+                .orderBy("project.createAt", pageOptionsDto.order)
+                .skip(pageOptionsDto.skip)
+                .take(pageOptionsDto.take)
+                .getMany();
+        }
         const itemCount = await queryBuilder.getCount();
         const { entities } = await queryBuilder.getRawAndEntities();
         const pageMetaDto = new page_meta_dto_1.PageMetaDto({ itemCount, pageOptionsDto });
         return new pagination_dto_1.PageDto(entities, pageMetaDto);
     }
-    async getListProjectOfAgent(agent) {
+    async getListProjectOfTenant(tenantID) {
         const listProject = this.projectRepository.find({
             where: {
-                tenantID: agent.tenantID,
+                tenantID: tenantID,
             }
         });
         return listProject;
@@ -100,7 +118,6 @@ let ProjectService = class ProjectService {
         }
     }
     async update(tenantID, id, updateProjectDto) {
-        console.log(tenantID);
         const updateProject = await this.getById(id, tenantID);
         try {
             updateProject.projectName = updateProjectDto.projectName;
@@ -110,17 +127,19 @@ let ProjectService = class ProjectService {
                     const newAttribute = await this.attributeRepository.create({
                         attributeName: attributeElement.key
                     });
-                    await this.projectAttributeRepository.create({
+                    this.attributeRepository.save(newAttribute);
+                    const newProjectAtt = await this.projectAttributeRepository.create({
                         attributeID: newAttribute.id,
                         projectID: id,
                         value: attributeElement.value
                     });
+                    this.projectAttributeRepository.save(newProjectAtt);
                 }
                 else {
                     const projectAttributeRecord = await this.projectAttributeRepository.findOne({
                         where: {
                             id: attributeElement.id,
-                            projectID: id
+                            projectID: id,
                         }
                     });
                     projectAttributeRecord.value = attributeElement.value;
@@ -159,10 +178,13 @@ ProjectService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(project_entity_1.Project)),
     __param(1, (0, typeorm_1.InjectRepository)(project_attribute_entity_1.ProjectAttribute)),
     __param(2, (0, typeorm_1.InjectRepository)(attribute_entity_1.Attribute)),
+    __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => agent_service_1.AgentService))),
+    __param(4, (0, common_1.Inject)((0, common_1.forwardRef)(() => tenant_service_1.TenantService))),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
         agent_service_1.AgentService,
+        tenant_service_1.TenantService,
         role_service_1.RoleService])
 ], ProjectService);
 exports.ProjectService = ProjectService;

@@ -25,6 +25,8 @@ const project_service_1 = require("../project/project.service");
 const project_entity_1 = require("../project/entities/project.entity");
 const project_attribute_entity_1 = require("../attribute/entities/project-attribute.entity");
 const tenant_entity_1 = require("../tenant/entities/tenant.entity");
+const tenant_module_1 = require("../tenant/tenant.module");
+const tenant_service_1 = require("../tenant/tenant.service");
 let AgentModule = class AgentModule {
 };
 AgentModule = __decorate([
@@ -33,9 +35,10 @@ AgentModule = __decorate([
             (0, common_1.forwardRef)(() => role_module_1.RoleModule),
             (0, common_1.forwardRef)(() => project_module_1.ProjectModule),
             (0, common_1.forwardRef)(() => attribute_module_1.AttributeModule),
+            (0, common_1.forwardRef)(() => tenant_module_1.TenantModule)
         ],
         controllers: [agent_controller_1.AgentController],
-        providers: [agent_service_1.AgentService, role_service_1.RoleService, project_service_1.ProjectService],
+        providers: [agent_service_1.AgentService, role_service_1.RoleService, project_service_1.ProjectService, tenant_service_1.TenantService],
         exports: [agent_service_1.AgentService]
     })
 ], AgentModule);

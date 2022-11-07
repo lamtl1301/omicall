@@ -17,15 +17,16 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto, @Query() agentID: number) {
-    return this.projectService.create(createProjectDto, agentID);
+  create(@Body() createProjectDto: CreateProjectDto, 
+  @User('id') agentID: number,
+  @User('tenantID') tenantID: string) {
+    return this.projectService.create(createProjectDto, agentID, tenantID);
   }
 
   @Get()
   async getListProject(
     @User('tenantID') tenantID: string ,
     @Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<Project>> {
-      console.log("tenantID", tenantID)
       return this.projectService.getListProject(tenantID, pageOptionsDto);
   }
 

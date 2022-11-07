@@ -35,11 +35,11 @@ let TenantController = class TenantController {
         console.log(createTenantDto instanceof create_tenant_dto_1.CreateTenantDto);
         return this.tenantService.create(userID, createTenantDto);
     }
-    update(id, updateTenantDto) {
-        return this.tenantService.update(id, updateTenantDto);
+    update(tenantID, updateTenantDto, userID) {
+        return this.tenantService.update(tenantID, updateTenantDto, userID);
     }
-    remove(id) {
-        return this.tenantService.remove(id);
+    remove(tenantID, userID) {
+        return this.tenantService.remove(tenantID, userID);
     }
 };
 __decorate([
@@ -71,18 +71,20 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('tenantID')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, user_decorator_1.User)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_tenant_dto_1.UpdateTenantDto]),
+    __metadata("design:paramtypes", [String, update_tenant_dto_1.UpdateTenantDto, Number]),
     __metadata("design:returntype", void 0)
 ], TenantController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('tenantID')),
+    __param(1, (0, user_decorator_1.User)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Number]),
     __metadata("design:returntype", void 0)
 ], TenantController.prototype, "remove", null);
 TenantController = __decorate([

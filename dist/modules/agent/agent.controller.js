@@ -17,21 +17,28 @@ const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const page_option_dto_1 = require("../../common/dto/page-option.dto");
+const user_decorator_1 = require("../../decorator/user.decorator");
+const mail_service_1 = require("../mail/mail.service");
 const agent_service_1 = require("./agent.service");
 const create_agent_dto_1 = require("./dto/create-agent.dto");
 const update_agent_dto_1 = require("./dto/update-agent.dto");
 let AgentController = class AgentController {
-    constructor(agentService) {
+    constructor(agentService, mailService) {
         this.agentService = agentService;
+        this.mailService = mailService;
     }
-    getListAgent(pageOptionsDto) {
-        return this.agentService.getListAgent(pageOptionsDto);
+    getListAgent(tenantID, pageOptionsDto) {
+        return this.agentService.getListAgent(tenantID, pageOptionsDto);
     }
     getById(id) {
         return this.agentService.getById(+id);
     }
-    create(tenantID, createAgentDto) {
-        return this.agentService.createAgent(tenantID, createAgentDto);
+    async create(tenantID, createAgentDto) {
+        const dataAgent = await this.agentService.createAgent(tenantID, createAgentDto);
+        console.log("dataAgent", dataAgent);
+        const agentCreated = dataAgent.createdAgent;
+        await this.mailService.sendVerificationEmail(dataAgent.password, dataAgent.createdAgent, dataAgent.tenantName);
+        return { agentCreated };
     }
     update(id, tenantID, updateAgentDto) {
         return this.agentService.update(+id, tenantID, updateAgentDto);
@@ -44,9 +51,10 @@ __decorate([
     (0, swagger_1.ApiBadRequestResponse)({ description: 'Bad request' }),
     (0, common_1.Get)(),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Query)()),
+    __param(0, (0, user_decorator_1.User)('tenantID')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [page_option_dto_1.PageOptionsDto]),
+    __metadata("design:paramtypes", [String, page_option_dto_1.PageOptionsDto]),
     __metadata("design:returntype", Promise)
 ], AgentController.prototype, "getListAgent", null);
 __decorate([
@@ -61,12 +69,12 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiBadRequestResponse)({ description: 'Bad request' }),
     (0, common_1.Post)(''),
-    openapi.ApiResponse({ status: 201, type: require("./entities/agent.entity").Agent }),
-    __param(0, (0, common_1.Param)()),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, user_decorator_1.User)('tenantID')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, create_agent_dto_1.CreateAgentDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AgentController.prototype, "create", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ description: 'Agent update successfully' }),
@@ -74,7 +82,7 @@ __decorate([
     (0, common_1.Patch)(':id'),
     openapi.ApiResponse({ status: 200, type: Object }),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('tenant_id')),
+    __param(1, (0, user_decorator_1.User)('tenantID')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, update_agent_dto_1.UpdateAgentDto]),
@@ -86,7 +94,7 @@ __decorate([
     (0, common_1.Delete)(':id'),
     openapi.ApiResponse({ status: 200, type: String }),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('tenant_id')),
+    __param(1, (0, user_decorator_1.User)('tenantID')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
@@ -95,7 +103,8 @@ AgentController = __decorate([
     (0, swagger_1.ApiTags)('Agents'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)(':tenantID/agents'),
-    __metadata("design:paramtypes", [agent_service_1.AgentService])
+    __metadata("design:paramtypes", [agent_service_1.AgentService,
+        mail_service_1.MailService])
 ], AgentController);
 exports.AgentController = AgentController;
 //# sourceMappingURL=agent.controller.js.map

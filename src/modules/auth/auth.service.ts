@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AgentService } from '../agent/agent.service';
 import bcrypt from 'bcrypt'
 import moment, { Moment } from 'moment'
@@ -7,9 +7,13 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EnviromentVariables } from 'src/interface/env.interface';
 import { TokenService } from './token/token.service';
-import { TokenType } from './entities/token.entity';
+import { Token, TokenType } from './entities/token.entity';
 import { ProjectService } from '../project/project.service';
 import { TenantService } from '../tenant/tenant.service';
+import { Agent } from '../agent/entities/agent.entity';
+import { MailService } from '../mail/mail.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +22,10 @@ export class AuthService {
         private readonly tokenService: TokenService,
         private readonly projectService: ProjectService,
         private readonly tenantService: TenantService,
+        private readonly mailService: MailService,
         private readonly jwtService: JwtService,
+        @InjectRepository(Token)
+        private tokenRepositoy: Repository<Token>,
         private readonly configService: ConfigService<EnviromentVariables>
     ) { }
     async validateUser(id: number) {
@@ -35,7 +42,7 @@ export class AuthService {
                     const token = await this.tokenService.createAuthToken(user.id)
                     return { user, token}
                 } else {
-                    const listProject = await this.projectService.getListProjectOfAgent(user);
+                    const listProject = await this.projectService.getListProjectOfTenant(user.tenantID);
                     //th listproject null, user.isowner == true (tenant)
                     return { user, tenant, listProject  }
                 }
@@ -61,6 +68,7 @@ export class AuthService {
         } 
     }
 
+
     async refreshTokens(refreshToken: string) {
         try {
             return this.tokenService.refresh(refreshToken)
@@ -71,7 +79,30 @@ export class AuthService {
 
     async logout(agent_id: number) {
         try {
-            return this.tokenService.remove(agent_id)
+            return this.tokenService.remove(agent_id, TokenType.REFRESH_TOKEN)
+        } catch (error) {
+            throw error
+        }
+    }
+    async verifyEmail(verifyToken: string) {
+        try {
+            console.log("verifyToken", verifyToken)
+            const token = await this.tokenRepositoy.findOneOrFail({ 
+                where: {
+                    id: verifyToken
+                }
+            })
+            console.log("token", token)
+            const isTokenExpired = await this.tokenService.verifyToken( token.id, TokenType.VERIFY_EMAIL);
+            console.log("isTokenExpired", isTokenExpired)
+            if (isTokenExpired){
+                await this.agentService.activedAgent(token.agentID)
+                await this.tokenService.remove(token.agentID, TokenType.VERIFY_EMAIL)
+                
+            } else {
+                throw new BadRequestException(' Token is expired')
+            }
+
         } catch (error) {
             throw error
         }

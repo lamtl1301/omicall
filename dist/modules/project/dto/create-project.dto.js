@@ -15,14 +15,9 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateProjectDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { tenantID: { required: true, type: () => String }, projectName: { required: true, type: () => String }, pbx_domain: { required: true, type: () => String }, description: { required: true, type: () => String }, attribute: { required: true, type: () => [require("../../../common/attribute.type").Attribute] } };
+        return { projectName: { required: true, type: () => String }, pbx_domain: { required: true, type: () => String }, description: { required: true, type: () => String }, attribute: { required: true, type: () => [require("../../../common/attribute.type").Attribute] } };
     }
 }
-__decorate([
-    (0, swagger_1.ApiProperty)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", String)
-], CreateProjectDto.prototype, "tenantID", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsString)(),
